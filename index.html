@@ -114,8 +114,11 @@ nav.scrolled {
   font-size: 2.4rem; font-weight: 900; color: #c27ba0;
   margin: 0 auto 2rem;
   box-shadow: 0 0 50px rgba(161,89,130,0.2);
-  position: relative; z-index: 1;
+  position: relative; z-index: 1; overflow: hidden;
   animation: fadeUp 0.75s 0.05s ease both;
+}
+.avatar img, .card-av img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
 }
 .hero h1 {
   font-size: clamp(3rem,8vw,6.5rem); font-weight: 900;
@@ -235,6 +238,7 @@ section { padding: 7rem 2rem; position: relative; }
   display: flex; align-items: center; justify-content: center;
   font-size: 1.8rem; font-weight: 900; color: #c27ba0;
   margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(161,89,130,0.2);
+  overflow: hidden;
 }
 .card-name { font-size: 1.1rem; font-weight: 900; margin-bottom: 0.3rem; color: #f0f0f5; }
 .card-role { color: #c27ba0; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.4rem; }
@@ -448,7 +452,7 @@ footer {
 <section class="hero" id="home">
   <div class="hero-bg"></div>
   <div class="badge"><span class="badge-dot"></span>Open to opportunities</div>
-  <div class="avatar">TH</div>
+  <div class="avatar" id="heroAvatar"><span class="avatar-fallback">TH</span></div>
   <h1>Tasnimul<br><span class="grad">Hasan</span></h1>
   <p class="hero-sub">Developer &amp; Android Enthusiast · Based in Bangladesh</p>
   <div class="hero-btns">
@@ -488,7 +492,7 @@ footer {
     <div class="about-grid">
       <div class="rev">
         <div class="about-card">
-          <div class="card-av">TH</div>
+          <div class="card-av" id="cardAvatar"><span class="avatar-fallback">TH</span></div>
           <div class="card-name">Tasnimul Hasan</div>
           <div class="card-role">Developer &amp; Android Enthusiast</div>
           <div class="chips">
@@ -503,7 +507,7 @@ footer {
         <span class="lbl rev">About Me</span>
         <h2 class="s-title rev d1">Who I <span class="hl">Am</span></h2>
         <div class="rev d2">
-          <p class="about-p">I'm a college student with a passion for customizing Android. I enjoy flashing custom ROMs, tweaking settings, and writing code — whether it's practical or just for fun.</p>
+          <p class="about-p">I'm a college student with a passion for customizing Android. I enjoy flashing custom ROMs, tweaking settings, and writing code, whether it's practical or just for fun.</p>
           <p class="about-p">My goal is to keep learning and experimenting with new ways to enhance my devices, dive deeper into tech, and build things that are actually useful.</p>
         </div>
       </div>
@@ -643,11 +647,11 @@ footer {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card" href="/cdn-cgi/l/email-protection#06766371623030373746616b676f6a2865696b">
+        <a class="soc-card" href="mailto:tnhsn0@gmail.com">
           <div class="soc-ico" style="background:rgba(209,72,54,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#f0f0f5"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="9bebfeecffadadaaaadbfcf6faf2f7b5f8f4f6">[email&#160;protected]</span></div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
         </a>
 
         <a class="soc-card" href="https://www.facebook.com/rx.toxic.bot" target="_blank" rel="noopener noreferrer">
@@ -657,11 +661,11 @@ footer {
           <div><div class="soc-lbl">Facebook</div><div class="soc-user">rx.toxic.bot</div></div>
         </a>
 
-        <a class="soc-card" href="https://www.instagram.com/rx.toxic.bot" target="_blank" rel="noopener noreferrer">
+        <a class="soc-card" href="https://www.instagram.com/tasnimulhasan0" target="_blank" rel="noopener noreferrer">
           <div class="soc-ico" style="background:rgba(228,64,95,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#f0f0f5"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
           </div>
-          <div><div class="soc-lbl">Instagram</div><div class="soc-user">rx.toxic.bot</div></div>
+          <div><div class="soc-lbl">Instagram</div><div class="soc-user">tasnimulhasan0</div></div>
         </a>
 
         <a class="soc-card" href="https://t.me/TasnimulHasan0" target="_blank" rel="noopener noreferrer">
@@ -689,9 +693,9 @@ footer {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="/cdn-cgi/l/email-protection#c9b9acbeadfffff8f889aea4a8a0a5e7aaa6a4" class="email-link">
+        <a href="mailto:tnhsn0@gmail.com" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          <span class="__cf_email__" data-cfemail="ccbca9bba8fafafdfd8caba1ada5a0e2afa3a1">[email&#160;protected]</span>
+          tnhsn0@gmail.com
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -709,7 +713,7 @@ footer {
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   window.addEventListener('scroll', function() {
     document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
   });
@@ -741,6 +745,31 @@ footer {
     });
   }, { threshold: 0.1 });
   skCards.forEach(function(c) { so.observe(c); });
+
+  // --- PROFILE PHOTO AUTO-LOADER ---
+  var photoNames = ['profile.jpg','profile.jpeg','profile.png','profile.webp'];
+  var loaded = false;
+  function tryNext(i) {
+    if (i >= photoNames.length || loaded) return;
+    var img = new Image();
+    img.onload = function() {
+      if (loaded) return;
+      loaded = true;
+      var hero = document.getElementById('heroAvatar');
+      hero.innerHTML = '';
+      var i1 = document.createElement('img');
+      i1.src = img.src; i1.alt = 'Tasnimul Hasan';
+      hero.appendChild(i1);
+      var card = document.getElementById('cardAvatar');
+      card.innerHTML = '';
+      var i2 = document.createElement('img');
+      i2.src = img.src; i2.alt = 'Tasnimul Hasan';
+      card.appendChild(i2);
+    };
+    img.onerror = function() { tryNext(i + 1); };
+    img.src = photoNames[i];
+  }
+  tryNext(0);
 
   var words = document.querySelectorAll('.word');
   var cur = 0;
