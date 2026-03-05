@@ -24,35 +24,90 @@ body {
 
 /* NAV */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  position: fixed;
+  top: 0.5rem; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 1rem;
+  pointer-events: none;
+  transition: top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+nav.scrolled { top: 1rem; }
+
+/* Floating pill */
+.nav-inner {
+  pointer-events: all;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1.1rem 3rem;
-  background: rgba(5,5,8,0.55);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  transition: background 0.3s, border-color 0.3s;
+  width: 100%; max-width: 1200px;
+  height: 3.75rem;
+  padding: 0 1rem;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  overflow: hidden;
+  /* Inverted dot texture: transparent holes in dark fill — like Upscayl */
+  background-color: rgba(7,9,20,0);
+  background-image: radial-gradient(rgba(0,0,0,0) 1px, rgba(7,9,20,0) 1px);
+  background-size: 4px 4px;
+  -webkit-backdrop-filter: blur(0px) brightness(1);
+  backdrop-filter: blur(0px) brightness(1);
+  transition:
+    background-color         0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-image         0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color             0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow               0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    padding                  0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    backdrop-filter          0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    -webkit-backdrop-filter  0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-nav.scrolled {
-  background: rgba(5,5,8,0.82);
-  border-bottom-color: rgba(255,255,255,0.12);
+nav.scrolled .nav-inner {
+  padding: 0 1.8rem;
+  background-color: rgba(7,9,20,0.55);
+  background-image: radial-gradient(rgba(0,0,0,0) 1px, rgba(7,9,20,0.55) 1px);
+  background-size: 4px 4px;
+  border-color: rgba(100,116,139,0.45);
+  -webkit-backdrop-filter: blur(14px) brightness(1.5);
+  backdrop-filter: blur(14px) brightness(1.5);
+  box-shadow: 0 4px 40px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset;
 }
+
+/* Logo nudges inward at rest, spreads to edge on scroll */
 .logo {
   font-size: 1.2rem; font-weight: 900;
   background: linear-gradient(135deg,#a15982,#c27ba0);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background-clip: text; white-space: nowrap;
+  position: relative; z-index: 1;
+  transform: translateX(16px);
+  transition: transform 0.6s cubic-bezier(0.34, 1.25, 0.64, 1);
 }
+nav.scrolled .logo { transform: translateX(0); }
+
+/* Right side nudges inward, spreads out on scroll */
+.nav-right {
+  display: flex; align-items: center; gap: 1.4rem;
+  position: relative; z-index: 1;
+  transform: translateX(-16px);
+  transition: transform 0.6s cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+nav.scrolled .nav-right { transform: translateX(0); }
+
 .nav-links { display: flex; gap: 2rem; align-items: center; }
 .nav-links a {
-  color: #7a7a8c; text-decoration: none; font-size: 0.85rem;
-  font-weight: 700; transition: color 0.2s;
+  color: rgba(240,240,245,0.6); text-decoration: none; font-size: 0.85rem;
+  font-weight: 600; transition: color 0.2s; letter-spacing: 0.01em;
 }
 .nav-links a:hover { color: #f0f0f5; }
 .nav-cta {
-  padding: 0.5rem 1.3rem; border-radius: 6px;
-  background: linear-gradient(135deg,#a15982,#c27ba0) !important;
-  -webkit-text-fill-color: white !important; color: white !important;
+  padding: 0.42rem 1.2rem; border-radius: 99px;
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  -webkit-text-fill-color: rgba(240,240,245,0.9) !important;
+  color: rgba(240,240,245,0.9) !important;
+  transition: background 0.2s, border-color 0.2s !important;
+}
+.nav-cta:hover {
+  background: rgba(161,89,130,0.28) !important;
+  border-color: rgba(194,123,160,0.45) !important;
 }
 .menu-btn {
   display: none; background: none; border: none;
@@ -405,7 +460,9 @@ footer {
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
-  nav { padding: 1rem 1.5rem; }
+  nav { padding: 0 0.75rem; }
+  .nav-inner { padding: 0 1rem; }
+  nav.scrolled .nav-inner { padding: 0 1.2rem; }
   .nav-links { display: none; }
   .menu-btn { display: block; }
   .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -423,21 +480,25 @@ footer {
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="logo">Tasnimul.</div>
-  <div class="nav-links">
-    <a href="#home">Home</a>
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#hobbies">Hobbies</a>
-    <a href="#contact" class="nav-cta">CONNECT</a>
+  <div class="nav-inner">
+    <div class="logo">Tasnimul.</div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#hobbies">Hobbies</a>
+        <a href="#contact" class="nav-cta">CONNECT</a>
+      </div>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="18" x2="20" y2="18"/>
+        </svg>
+      </button>
+    </div>
   </div>
-  <button class="menu-btn" id="menuBtn" aria-label="Menu">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-      <line x1="4" y1="6" x2="20" y2="6"/>
-      <line x1="4" y1="12" x2="20" y2="12"/>
-      <line x1="4" y1="18" x2="20" y2="18"/>
-    </svg>
-  </button>
 </nav>
 
 <div class="mobile-nav" id="mobileNav">
@@ -707,9 +768,13 @@ footer {
 </footer>
 
 <script>
-  window.addEventListener('scroll', function() {
-    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
-  });
+  var navEl = document.getElementById('nav');
+  function updateNav() {
+    if (window.scrollY > 30) { navEl.classList.add('scrolled'); }
+    else { navEl.classList.remove('scrolled'); }
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
 
   document.getElementById('menuBtn').addEventListener('click', function() {
     document.getElementById('mobileNav').classList.toggle('open');
