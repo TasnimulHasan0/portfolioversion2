@@ -17,10 +17,30 @@ body {
   font-size: 16px;
   line-height: 1.6;
   overflow-x: hidden;
+  cursor: none;
 }
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: #050508; }
 ::-webkit-scrollbar-thumb { background: #a15982; border-radius: 99px; }
+
+/* ─── CURSOR ─── */
+#cursor {
+  position: fixed; width: 12px; height: 12px;
+  background: #c27ba0; border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, background .2s;
+  mix-blend-mode: difference;
+}
+#cursor-ring {
+  position: fixed; width: 40px; height: 40px;
+  border: 1px solid rgba(194,123,160,.4); border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: transform .12s ease-out, width .2s, height .2s, border-color .2s;
+}
+body.hovering #cursor { width: 20px; height: 20px; background: #a15982; }
+body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(161,89,130,.6); }
 
 /* NAV */
 nav {
@@ -134,7 +154,7 @@ nav.scrolled .nav-right { transform: translateX(0); }
 .hero {
   min-height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  text-align: center; padding: 8rem 2rem 5rem;
+  padding: 8rem 3rem 5rem;
   position: relative; overflow: hidden;
 }
 .hero-bg {
@@ -144,14 +164,37 @@ nav.scrolled .nav-right { transform: translateX(0); }
     radial-gradient(ellipse 50% 40% at 80% 80%, rgba(194,123,160,0.1) 0%, transparent 60%),
     radial-gradient(ellipse 40% 30% at 10% 60%, rgba(161,89,130,0.07) 0%, transparent 60%);
 }
+
+/* Animated blobs */
+.hero-blob {
+  position: absolute; border-radius: 50%;
+  filter: blur(110px); pointer-events: none;
+  animation: blobFloat 14s ease-in-out infinite;
+}
+.hero-blob-1 { width: 520px; height: 520px; background: rgba(161,89,130,0.18); top: -180px; right: -60px; animation-delay: 0s; }
+.hero-blob-2 { width: 380px; height: 380px; background: rgba(194,123,160,0.12); bottom: -80px; left: -80px; animation-delay: -5s; }
+.hero-blob-3 { width: 260px; height: 260px; background: rgba(161,89,130,0.1); top: 38%; left: 36%; animation-delay: -9s; }
+@keyframes blobFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%  { transform: translate(28px,-28px) scale(1.05); }
+  66%  { transform: translate(-18px,18px) scale(0.96); }
+}
+
+/* Two-column hero layout */
+.hero-inner {
+  max-width: 1200px; width: 100%; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+  align-items: center; position: relative; z-index: 1;
+}
+
 .badge {
   display: inline-flex; align-items: center; gap: 0.5rem;
   border: 1px solid rgba(161,89,130,0.3); border-radius: 99px;
   padding: 0.4rem 1.1rem; font-size: 0.75rem; font-weight: 800;
-  color: #c27ba0; margin-bottom: 2rem;
+  color: #c27ba0; margin-bottom: 1.6rem;
   background: rgba(161,89,130,0.08); letter-spacing: 0.07em;
   text-transform: uppercase; position: relative; z-index: 1;
-  animation: fadeUp 0.7s ease both;
+  opacity: 0; animation: fadeUp 0.6s 0.15s ease both;
 }
 .badge-dot {
   width: 6px; height: 6px; border-radius: 50%;
@@ -162,41 +205,75 @@ nav.scrolled .nav-right { transform: translateX(0); }
   0%,100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.5); }
 }
+
+/* Hero heading left-aligned */
+.hero h1 {
+  font-size: clamp(3rem,6.5vw,6rem); font-weight: 900;
+  line-height: 1.0; letter-spacing: -0.04em;
+  position: relative; z-index: 1;
+  text-align: left;
+  opacity: 0; animation: fadeUp 0.75s 0.3s ease both;
+}
+.grad {
+  background: linear-gradient(135deg,#a15982,#c27ba0,#e87dbf);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; display: block;
+  background-size: 200% 200%;
+  animation: gradShift 4s ease infinite;
+}
+@keyframes gradShift {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.hero-sub {
+  font-size: clamp(0.95rem,1.8vw,1.05rem); color: #7a7a8c;
+  max-width: 480px; margin: 1.4rem 0 0; line-height: 1.8;
+  z-index: 1; position: relative; text-align: left;
+  opacity: 0; animation: fadeUp 0.8s 0.45s ease both;
+}
+.hero-btns {
+  display: flex; gap: 1rem; margin-top: 2.2rem;
+  flex-wrap: wrap; justify-content: flex-start;
+  z-index: 1; position: relative;
+  opacity: 0; animation: fadeUp 0.85s 0.6s ease both;
+}
+
+/* Right side: avatar with orbit ring */
+.hero-right {
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; animation: heroRight 0.9s 0.35s ease both;
+}
+@keyframes heroRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.hero-avatar-wrap {
+  position: relative; width: 300px; height: 300px;
+}
+.hero-orbit {
+  position: absolute; inset: -22px; border-radius: 50%;
+  border: 1px solid rgba(161,89,130,0.25);
+  animation: orbitSpin 22s linear infinite;
+}
+.hero-orbit::after {
+  content: ''; position: absolute; width: 11px; height: 11px;
+  background: #c27ba0; border-radius: 50%;
+  top: -5.5px; left: 50%; transform: translateX(-50%);
+  box-shadow: 0 0 18px rgba(194,123,160,0.8);
+}
+@keyframes orbitSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 .avatar {
-  width: 120px; height: 120px; border-radius: 50%;
+  width: 100%; height: 100%; border-radius: 50%;
   background: #0f0f17; border: 2px solid rgba(161,89,130,0.3);
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.4rem; font-weight: 900; color: #c27ba0;
-  margin: 0 auto 2rem;
-  box-shadow: 0 0 50px rgba(161,89,130,0.2);
+  font-size: 4rem; font-weight: 900; color: #c27ba0;
+  box-shadow: 0 0 60px rgba(161,89,130,0.25);
   position: relative; z-index: 1; overflow: hidden;
-  animation: fadeUp 0.75s 0.05s ease both;
 }
 .avatar img, .card-av img {
   width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
-}
-.hero h1 {
-  font-size: clamp(3rem,8vw,6.5rem); font-weight: 900;
-  line-height: 1; letter-spacing: -0.04em;
-  position: relative; z-index: 1;
-  animation: fadeUp 0.85s 0.1s ease both;
-}
-.grad {
-  background: linear-gradient(135deg,#a15982,#c27ba0);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; display: block;
-}
-.hero-sub {
-  font-size: clamp(0.95rem,2vw,1.1rem); color: #7a7a8c;
-  max-width: 540px; margin: 1.5rem auto 0; line-height: 1.8;
-  z-index: 1; position: relative;
-  animation: fadeUp 0.9s 0.2s ease both;
-}
-.hero-btns {
-  display: flex; gap: 1rem; margin-top: 2.5rem;
-  flex-wrap: wrap; justify-content: center;
-  z-index: 1; position: relative;
-  animation: fadeUp 1s 0.35s ease both;
 }
 .btn-p {
   background: linear-gradient(135deg,#a15982,#c27ba0);
@@ -276,7 +353,10 @@ section { padding: 7rem 2rem; position: relative; }
   position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(ellipse 60% 70% at 90% 50%, rgba(161,89,130,0.07) 0%, transparent 60%);
 }
-.about-grid { display: grid; grid-template-columns: 300px 1fr; gap: 5rem; align-items: center; }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.about-body { }
+.about-heading { }
+.chips { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 0.55rem; margin-top: 1.8rem; }
 .about-card {
   background: #0f0f17; border: 1px solid rgba(161,89,130,0.18);
   border-radius: 20px; padding: 2.5rem 2rem; text-align: center;
@@ -297,11 +377,10 @@ section { padding: 7rem 2rem; position: relative; }
 }
 .card-name { font-size: 1.1rem; font-weight: 900; margin-bottom: 0.3rem; color: #f0f0f5; }
 .card-role { color: #c27ba0; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.4rem; }
-.chips { display: flex; flex-direction: column; gap: 0.55rem; }
 .chip {
   background: rgba(161,89,130,0.08); border: 1px solid rgba(161,89,130,0.18);
-  border-radius: 8px; padding: 0.55rem 1rem; font-size: 0.8rem;
-  color: #c27ba0; text-align: left; display: flex; align-items: center; gap: 0.6rem;
+  border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.78rem;
+  color: #c27ba0; text-align: left; display: flex; align-items: center; gap: 0.5rem;
   font-weight: 600;
 }
 .about-p { color: #7a7a8c; line-height: 1.85; margin-bottom: 1.2rem; font-size: 0.95rem; }
@@ -465,18 +544,32 @@ footer {
   nav.scrolled .nav-inner { padding: 0 1.2rem; }
   .nav-links { display: none; }
   .menu-btn { display: block; }
-  .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .about-heading { order: -1; }
+  .chips { max-width: 100%; }
   .hob-grid { grid-template-columns: 1fr 1fr; }
   .con-grid { grid-template-columns: 1fr; gap: 2.2rem; }
+  /* Hero responsive */
+  .hero { padding: 7rem 1.5rem 4rem; }
+  .hero-inner { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
+  .hero h1 { text-align: center; }
+  .hero-sub { margin: 1.4rem auto 0; text-align: center; }
+  .hero-btns { justify-content: center; }
+  .hero-right { order: -1; }
+  .hero-avatar-wrap { width: 200px; height: 200px; }
 }
 @media (max-width: 600px) {
   .hob-grid { grid-template-columns: 1fr; }
   section { padding: 4.5rem 1.2rem; }
   .sk-grid { grid-template-columns: repeat(auto-fill, minmax(95px,1fr)); }
+  .hero-avatar-wrap { width: 160px; height: 160px; }
 }
 </style>
 </head>
 <body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
 <!-- NAV -->
 <nav id="nav">
@@ -512,13 +605,27 @@ footer {
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg"></div>
-  <div class="badge"><span class="badge-dot"></span>Open to opportunities</div>
-  <div class="avatar" id="heroAvatar"><span class="avatar-fallback">TH</span></div>
-  <h1>Tasnimul<br><span class="grad">Hasan</span></h1>
-  <p class="hero-sub">Developer &amp; Android Enthusiast · Based in Bangladesh</p>
-  <div class="hero-btns">
-    <a href="#about" class="btn-p">About Me</a>
-    <a href="#contact" class="btn-g">Contact Me</a>
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-inner">
+    <!-- Left: text -->
+    <div class="hero-left">
+      <div class="badge"><span class="badge-dot"></span>Open to opportunities</div>
+      <h1>Tasnimul<br><span class="grad">Hasan.</span></h1>
+      <p class="hero-sub">Developer &amp; Android Enthusiast based in Bangladesh.</p>
+      <div class="hero-btns">
+        <a href="#about" class="btn-p">About Me →</a>
+        <a href="#contact" class="btn-g">Contact Me</a>
+      </div>
+    </div>
+    <!-- Right: avatar with orbit ring -->
+    <div class="hero-right">
+      <div class="hero-avatar-wrap">
+        <div class="hero-orbit"></div>
+        <div class="avatar" id="heroAvatar"><span class="avatar-fallback">TH</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -550,28 +657,17 @@ footer {
 <section id="about">
   <div class="about-glow"></div>
   <div class="inner">
-    <div class="about-grid">
-      <div class="rev">
-        <div class="about-card">
-          <div class="card-av" id="cardAvatar"><span class="avatar-fallback">TH</span></div>
-          <div class="card-name">Tasnimul Hasan</div>
-          <div class="card-role">Developer &amp; Android Enthusiast</div>
-          <div class="chips">
-            <div class="chip">📍 Bangladesh</div>
-            <div class="chip">🎓 College Student</div>
-            <div class="chip">📱 Android Enthusiast</div>
-            <div class="chip">💻 Developer</div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <span class="lbl rev">About Me</span>
-        <h2 class="s-title rev d1">Who I <span class="hl">Am</span></h2>
-        <div class="rev d2">
-          <p class="about-p">I'm a college student with a passion for customizing Android. I enjoy flashing custom ROMs, tweaking settings, and writing code, whether it's practical or just for fun.</p>
-          <p class="about-p">My goal is to keep learning and experimenting with new ways to enhance my devices, dive deeper into tech, and build things that are actually useful.</p>
-        </div>
-      </div>
+    <span class="lbl rev">About Me</span>
+    <h2 class="s-title rev d1">Who I <span class="hl">Am</span></h2>
+    <div class="rev d2">
+      <p class="about-p">I'm a college student with a passion for customizing Android. I enjoy flashing custom ROMs, tweaking settings, and writing code, whether it's practical or just for fun.</p>
+      <p class="about-p">My goal is to keep learning and experimenting with new ways to enhance my devices, dive deeper into tech, and build things that are actually useful.</p>
+    </div>
+    <div class="chips rev d3">
+      <div class="chip">📍 Bangladesh</div>
+      <div class="chip">🎓 College Student</div>
+      <div class="chip">📱 Android Enthusiast</div>
+      <div class="chip">💻 Developer</div>
     </div>
   </div>
 </section>
@@ -708,11 +804,11 @@ footer {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card" href="mailto:tnhsn0@gmail.com">
+        <a class="soc-card" href="/cdn-cgi/l/email-protection#a5d1cbcdd6cb95e5c2c8c4ccc98bc6cac8">
           <div class="soc-ico" style="background:rgba(209,72,54,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#f0f0f5"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="a6d2c8ced5c896e6c1cbc7cfca88c5c9cb">[email&#160;protected]</span></div></div>
         </a>
 
         <a class="soc-card" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -747,9 +843,9 @@ footer {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="mailto:tnhsn0@gmail.com" class="email-link">
+        <a href="/cdn-cgi/l/email-protection#daaeb4b2a9b4ea9abdb7bbb3b6f4b9b5b7" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          tnhsn0@gmail.com
+          <span class="__cf_email__" data-cfemail="96e2f8fee5f8a6d6f1fbf7fffab8f5f9fb">[email&#160;protected]</span>
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -767,7 +863,28 @@ footer {
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ─── CURSOR ───
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * .12;
+    ry += (my - ry) * .12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  document.querySelectorAll('a, button, .skill-card, .hobby-card, .contact-link').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+
   var navEl = document.getElementById('nav');
   function updateNav() {
     if (window.scrollY > 30) { navEl.classList.add('scrolled'); }
@@ -775,6 +892,17 @@ footer {
   }
   window.addEventListener('scroll', updateNav, { passive: true });
   updateNav();
+
+  // Parallax blobs on scroll
+  window.addEventListener('scroll', function() {
+    var y = window.scrollY;
+    var b1 = document.querySelector('.hero-blob-1');
+    var b2 = document.querySelector('.hero-blob-2');
+    var b3 = document.querySelector('.hero-blob-3');
+    if (b1) b1.style.transform = 'translateY(' + (y * 0.14) + 'px)';
+    if (b2) b2.style.transform = 'translateY(' + (-y * 0.09) + 'px)';
+    if (b3) b3.style.transform = 'translate(' + (y * 0.04) + 'px,' + (-y * 0.07) + 'px)';
+  }, { passive: true });
 
   document.getElementById('menuBtn').addEventListener('click', function() {
     document.getElementById('mobileNav').classList.toggle('open');
@@ -818,11 +946,6 @@ footer {
       var i1 = document.createElement('img');
       i1.src = img.src; i1.alt = 'Tasnimul Hasan';
       hero.appendChild(i1);
-      var card = document.getElementById('cardAvatar');
-      card.innerHTML = '';
-      var i2 = document.createElement('img');
-      i2.src = img.src; i2.alt = 'Tasnimul Hasan';
-      card.appendChild(i2);
     };
     img.onerror = function() { tryNext(i + 1); };
     img.src = photoNames[i];
