@@ -91,12 +91,11 @@ body {
   top: 0; left: 0;
   transform: translate(-50%,-50%);
   transition: width .2s, height .2s, background .2s;
-  mix-blend-mode: difference;
   will-change: transform;
 }
 #cursor-ring {
   position: fixed; width: 40px; height: 40px;
-  border: 1px solid rgba(194,123,160,.4); border-radius: 50%;
+  border: 1px solid rgba(194,123,160,.5); border-radius: 50%;
   pointer-events: none; z-index: 9998;
   top: 0; left: 0;
   transform: translate(-50%,-50%);
@@ -105,6 +104,9 @@ body {
 }
 body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(161,89,130,.6); }
+@media (hover: hover) and (pointer: fine) {
+  *, *::before, *::after { cursor: none !important; }
+}
 @media (hover: none) and (pointer: coarse) {
   #cursor, #cursor-ring { display: none !important; }
   body { cursor: auto; }
@@ -587,10 +589,9 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: 12px; padding: 1.4rem 1rem;
   display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
-  text-align: center; opacity: 0; transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  text-align: center;
+  transition: opacity 0.65s ease, transform 0.65s ease, filter 0.65s ease, border-color 0.3s, background 0.3s, box-shadow 0.3s;
 }
-.sk-card.on { opacity: 1; transform: translateY(0); }
 .sk-card:hover {
   border-color: var(--acc1); background: rgba(161,89,130,0.07);
   transform: translateY(-4px); box-shadow: 0 8px 30px rgba(161,89,130,0.15);
@@ -634,7 +635,7 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
 .hob-card {
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: 14px; padding: 2rem;
-  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s, opacity 0.65s ease, filter 0.65s ease;
 }
 .hob-card:hover {
   border-color: rgba(161,89,130,0.5);
@@ -694,6 +695,7 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: 16px; padding: 2.5rem;
   display: flex; flex-direction: column; gap: 1.2rem;
+  transition: opacity 0.65s ease, filter 0.65s ease, transform 0.65s ease, background 0.4s ease, border-color 0.4s ease;
 }
 .cta-box h3 { font-size: 1.55rem; font-weight: 900; line-height: 1.2; }
 .cta-box p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.75; }
@@ -1012,11 +1014,11 @@ footer {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card rev d1" href="mailto:tnhsn0@gmail.com">
+        <a class="soc-card rev d1" href="/cdn-cgi/l/email-protection#1763797f64792757707a767e7b3974787a">
           <div class="soc-ico" style="background:rgba(209,72,54,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="bdc9d3d5ced38dfddad0dcd4d193ded2d0">[email&#160;protected]</span></div></div>
         </a>
 
         <a class="soc-card rev d2" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -1051,9 +1053,9 @@ footer {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="mailto:tnhsn0@gmail.com" class="email-link">
+        <a href="/cdn-cgi/l/email-protection#3743595f44590777505a565e5b1954585a" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          tnhsn0@gmail.com
+          <span class="__cf_email__" data-cfemail="e3978d8b908dd3a3848e828a8fcd808c8e">[email&#160;protected]</span>
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -1071,7 +1073,7 @@ footer {
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ─── CURSOR (desktop only) ───
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cursor = document.getElementById('cursor');
@@ -1200,19 +1202,6 @@ footer {
     });
   }, { threshold: 0.3 });
   twEls.forEach(function(el) { two.observe(el); });
-
-  // ─── SKILL CARDS stagger ───
-  var skCards = document.querySelectorAll('.sk-card');
-  var so = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        var idx = Array.prototype.indexOf.call(skCards, e.target);
-        setTimeout(function() { e.target.classList.add('on'); }, idx * 80);
-        so.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  skCards.forEach(function(c) { so.observe(c); });
 
   // ─── PROFILE PHOTO (jpg only) ───
   var profileImg = new Image();
