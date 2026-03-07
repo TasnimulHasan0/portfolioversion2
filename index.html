@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tasnimul Hasan</title>
+<script>
+  // Run before CSS paints to prevent flash
+  (function() {
+    var saved = localStorage.getItem('theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isLight = saved ? (saved === 'light') : !prefersDark;
+    if (isLight) document.documentElement.classList.add('light');
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
@@ -201,22 +210,64 @@ nav.scrolled .nav-right { transform: translateX(0); }
 }
 .theme-btn:hover { opacity: 1; }
 .theme-btn svg, .menu-btn svg { display: block; }
+@keyframes navOpen {
+  from { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: transparent; }
+  to   { opacity: 1; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+}
+@keyframes navClose {
+  from { opacity: 1; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+  to   { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: transparent; }
+}
 .mobile-nav {
   position: fixed; inset: 0;
-  background: var(--overlay-bg);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
-  backdrop-filter: blur(28px) saturate(160%);
+  background: transparent;
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
   z-index: 99;
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 2.5rem;
-  transform: translateX(100%); transition: transform 0.35s ease;
+  opacity: 0;
+  pointer-events: none;
 }
-.mobile-nav.open { transform: translateX(0); }
+.mobile-nav.open {
+  opacity: 1;
+  background: rgba(5,5,8,0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  pointer-events: all;
+  animation: navOpen 0.35s ease forwards;
+}
+html.light .mobile-nav.open {
+  background: rgba(247,246,244,0.65);
+}
+.mobile-nav.closing {
+  pointer-events: none;
+  animation: navClose 0.55s ease forwards;
+}
 .mobile-nav a {
   color: var(--text); text-decoration: none;
-  font-size: 1.6rem; font-weight: 900; transition: color 0.2s;
+  font-size: 1.6rem; font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  opacity: 0; transform: translateY(20px); filter: blur(8px);
+  transition: color 0.2s, opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
 }
+.mobile-nav.open a { opacity: 1; transform: translateY(0); filter: blur(0px); }
+.mobile-nav.open a:nth-child(1) { transition-delay: 0.07s; }
+.mobile-nav.open a:nth-child(2) { transition-delay: 0.13s; }
+.mobile-nav.open a:nth-child(3) { transition-delay: 0.19s; }
+.mobile-nav.open a:nth-child(4) { transition-delay: 0.25s; }
+.mobile-nav.open a:nth-child(5) { transition-delay: 0.31s; }
+.mobile-nav.closing a { opacity: 0 !important; transform: translateY(-12px) !important; filter: blur(6px) !important; transition-delay: 0s !important; }
 .mobile-nav a:hover { color: var(--acc2); }
+
+/* Hamburger ↔ X swap */
+.menu-btn .bar { transition: transform 0.3s ease, opacity 0.3s ease; transform-origin: center; }
+.menu-btn.open .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu-btn.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.menu-btn.open .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 /* HERO */
 .hero {
@@ -720,16 +771,16 @@ footer {
         <a href="#hobbies">Hobbies</a>
         <a href="#contact" class="nav-cta">CONNECT</a>
       </div>
-      <button class="menu-btn" id="menuBtn" aria-label="Menu">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <line x1="4" y1="6" x2="20" y2="6"/>
-          <line x1="4" y1="12" x2="20" y2="12"/>
-          <line x1="4" y1="18" x2="20" y2="18"/>
-        </svg>
-      </button>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
         <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line class="bar" x1="4" y1="6" x2="20" y2="6"/>
+          <line class="bar" x1="4" y1="12" x2="20" y2="12"/>
+          <line class="bar" x1="4" y1="18" x2="20" y2="18"/>
+        </svg>
       </button>
     </div>
   </div>
@@ -756,7 +807,7 @@ footer {
       <h1>Tasnimul<br><span class="grad">Hasan.</span></h1>
       <p class="hero-sub">Developer &amp; Android Enthusiast based in Bangladesh.</p>
       <div class="hero-btns">
-        <a href="#about" class="btn-p">About Me →</a>
+        <a href="#about" class="btn-p">About Me</a>
         <a href="#contact" class="btn-g">Contact Me</a>
       </div>
     </div>
@@ -957,11 +1008,11 @@ footer {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card rev d1" href="mailto:tnhsn0@gmail.com">
+        <a class="soc-card rev d1" href="/cdn-cgi/l/email-protection#40342e28332e7000272d21292c6e232f2d">
           <div class="soc-ico" style="background:rgba(209,72,54,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="bdc9d3d5ced38dfddad0dcd4d193ded2d0">[email&#160;protected]</span></div></div>
         </a>
 
         <a class="soc-card rev d2" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -996,9 +1047,9 @@ footer {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="mailto:tnhsn0@gmail.com" class="email-link">
+        <a href="/cdn-cgi/l/email-protection#3d4953554e530d7d5a505c5451135e5250" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          tnhsn0@gmail.com
+          <span class="__cf_email__" data-cfemail="7a0e141209144a3a1d171b131654191517">[email&#160;protected]</span>
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -1016,7 +1067,7 @@ footer {
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ─── CURSOR (desktop only) ───
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cursor = document.getElementById('cursor');
@@ -1056,11 +1107,24 @@ footer {
   }, { passive: true });
 
   // ─── MOBILE NAV ───
-  document.getElementById('menuBtn').addEventListener('click', function() {
-    document.getElementById('mobileNav').classList.toggle('open');
+  var menuBtn = document.getElementById('menuBtn');
+  var mobileNav = document.getElementById('mobileNav');
+  menuBtn.addEventListener('click', function() {
+    if (mobileNav.classList.contains('open')) {
+      closeMobile();
+    } else {
+      mobileNav.classList.remove('closing');
+      mobileNav.classList.add('open');
+      menuBtn.classList.add('open');
+    }
   });
   function closeMobile() {
-    document.getElementById('mobileNav').classList.remove('open');
+    menuBtn.classList.remove('open');
+    mobileNav.classList.remove('open');
+    mobileNav.classList.add('closing');
+    setTimeout(function() {
+      mobileNav.classList.remove('closing');
+    }, 560);
   }
 
   // ─── SCROLL SHRINK — per-element, only when near nav top ───
