@@ -88,16 +88,20 @@ body {
   position: fixed; width: 12px; height: 12px;
   background: var(--acc2); border-radius: 50%;
   pointer-events: none; z-index: 9999;
+  top: 0; left: 0;
   transform: translate(-50%,-50%);
   transition: width .2s, height .2s, background .2s;
   mix-blend-mode: difference;
+  will-change: transform;
 }
 #cursor-ring {
   position: fixed; width: 40px; height: 40px;
   border: 1px solid rgba(194,123,160,.4); border-radius: 50%;
   pointer-events: none; z-index: 9998;
+  top: 0; left: 0;
   transform: translate(-50%,-50%);
-  transition: transform .12s ease-out, width .2s, height .2s, border-color .2s;
+  transition: width .2s, height .2s, border-color .2s;
+  will-change: transform;
 }
 body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(161,89,130,.6); }
@@ -1008,11 +1012,11 @@ footer {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card rev d1" href="/cdn-cgi/l/email-protection#40342e28332e7000272d21292c6e232f2d">
+        <a class="soc-card rev d1" href="mailto:tnhsn0@gmail.com">
           <div class="soc-ico" style="background:rgba(209,72,54,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="bdc9d3d5ced38dfddad0dcd4d193ded2d0">[email&#160;protected]</span></div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
         </a>
 
         <a class="soc-card rev d2" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -1047,9 +1051,9 @@ footer {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="/cdn-cgi/l/email-protection#3d4953554e530d7d5a505c5451135e5250" class="email-link">
+        <a href="mailto:tnhsn0@gmail.com" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          <span class="__cf_email__" data-cfemail="7a0e141209144a3a1d171b131654191517">[email&#160;protected]</span>
+          tnhsn0@gmail.com
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -1067,18 +1071,20 @@ footer {
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   // ─── CURSOR (desktop only) ───
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    let mx = 0, my = 0, rx = 0, ry = 0, moved = false;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; moved = true; }, { passive: true });
     function animCursor() {
-      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-      rx += (mx - rx) * .12; ry += (my - ry) * .12;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
       requestAnimationFrame(animCursor);
+      if (!moved && Math.abs(mx - rx) < 0.1 && Math.abs(my - ry) < 0.1) return;
+      moved = false;
+      cursor.style.transform = 'translate(' + (mx - 6) + 'px,' + (my - 6) + 'px)';
+      rx += (mx - rx) * .12; ry += (my - ry) * .12;
+      ring.style.transform = 'translate(' + (rx - 20) + 'px,' + (ry - 20) + 'px)';
     }
     animCursor();
     document.querySelectorAll('a, button, .skill-card, .hobby-card, .contact-link').forEach(el => {
@@ -1127,30 +1133,33 @@ footer {
     }, 560);
   }
 
-  // ─── SCROLL SHRINK — per-element, only when near nav top ───
+  // ─── SCROLL SHRINK — opacity+transform only (no blur = no jank) ───
   var shrinkEls = Array.prototype.slice.call(document.querySelectorAll(
     '.hob-card, .sk-card, .soc-card, .cta-box, .about-p, .s-title, .s-sub, .lbl, .chips, .hob-grid, .sk-grid, .mq-track, .word-box, .rot-pre, .hero-inner'
   ));
-  shrinkEls.forEach(function(el) { el.classList.add('scroll-shrink'); });
+  shrinkEls.forEach(function(el) {
+    el.classList.add('scroll-shrink');
+    el.style.willChange = 'opacity, transform';
+  });
 
   var ticking = false;
   function runShrink() {
-    shrinkEls.forEach(function(el) {
-      var rect = el.getBoundingClientRect();
-      var bottom = rect.bottom; // when bottom approaches 0, element is leaving top
-      var fadeZone = 120; // only last 120px before element exits top
+    var fadeZone = 120;
+    for (var i = 0; i < shrinkEls.length; i++) {
+      var el = shrinkEls[i];
+      var bottom = el.getBoundingClientRect().bottom;
       if (bottom <= 0) {
-        el.style.cssText = 'opacity:0;filter:blur(10px);transform:scale(0.95)';
+        el.style.opacity = '0';
+        el.style.transform = 'scale(0.95)';
       } else if (bottom < fadeZone) {
         var p = 1 - (bottom / fadeZone);
-        el.style.cssText =
-          'opacity:' + (1 - p).toFixed(3) + ';' +
-          'filter:blur(' + (p * 10).toFixed(1) + 'px);' +
-          'transform:scale(' + (1 - p * 0.05).toFixed(4) + ')';
+        el.style.opacity = (1 - p).toFixed(3);
+        el.style.transform = 'scale(' + (1 - p * 0.05).toFixed(4) + ')';
       } else {
-        el.style.cssText = '';
+        el.style.opacity = '';
+        el.style.transform = '';
       }
-    });
+    }
     ticking = false;
   }
   window.addEventListener('scroll', function() {
@@ -1181,7 +1190,7 @@ footer {
       el.appendChild(span);
     }
     el.querySelectorAll('.tw-char').forEach(function(ch, idx) {
-      setTimeout(function() { ch.classList.add('show'); }, idx * 28);
+      setTimeout(function() { ch.classList.add('show'); }, idx * 12);
     });
   }
   var twEls = document.querySelectorAll('.tw');
