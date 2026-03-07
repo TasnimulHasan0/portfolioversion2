@@ -90,8 +90,8 @@ body {
   pointer-events: none; z-index: 9999;
   top: 0; left: 0;
   transform: translate(-50%,-50%);
-  transition: width .2s, height .2s, background .2s;
-  will-change: transform;
+  transition: width .2s, height .2s, background .2s, opacity .25s ease;
+  will-change: transform, opacity;
 }
 #cursor-ring {
   position: fixed; width: 40px; height: 40px;
@@ -99,8 +99,8 @@ body {
   pointer-events: none; z-index: 9998;
   top: 0; left: 0;
   transform: translate(-50%,-50%);
-  transition: width .2s, height .2s, border-color .2s;
-  will-change: transform;
+  transition: width .2s, height .2s, border-color .2s, opacity .25s ease;
+  will-change: transform, opacity;
 }
 body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(161,89,130,.6); }
@@ -530,11 +530,14 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
 
 /* typewriter text */
 .typewriter { display: block; }
+.typewriter .tw-word {
+  display: inline-block;
+  white-space: nowrap;
+}
 .typewriter .tw-char {
   opacity: 0;
   filter: blur(6px);
   display: inline;
-  white-space: pre-wrap;
   transition: opacity 0.2s ease, filter 0.2s ease;
 }
 .typewriter .tw-char.show { opacity: 1; filter: blur(0px); }
@@ -1014,11 +1017,11 @@ footer {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card rev d1" href="/cdn-cgi/l/email-protection#1763797f64792757707a767e7b3974787a">
+        <a class="soc-card rev d1" href="mailto:tnhsn0@gmail.com">
           <div class="soc-ico" style="background:rgba(209,72,54,.2)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="bdc9d3d5ced38dfddad0dcd4d193ded2d0">[email&#160;protected]</span></div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
         </a>
 
         <a class="soc-card rev d2" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -1053,9 +1056,9 @@ footer {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="/cdn-cgi/l/email-protection#3743595f44590777505a565e5b1954585a" class="email-link">
+        <a href="mailto:tnhsn0@gmail.com" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          <span class="__cf_email__" data-cfemail="e3978d8b908dd3a3848e828a8fcd808c8e">[email&#160;protected]</span>
+          tnhsn0@gmail.com
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -1073,13 +1076,19 @@ footer {
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   // ─── CURSOR (desktop only) ───
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0, moved = false;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; moved = true; }, { passive: true });
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = '0'; ring.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+      cursor.style.opacity = ''; ring.style.opacity = '';
+    });
     function animCursor() {
       requestAnimationFrame(animCursor);
       if (!moved && Math.abs(mx - rx) < 0.1 && Math.abs(my - ry) < 0.1) return;
@@ -1087,6 +1096,17 @@ footer {
       cursor.style.transform = 'translate(' + (mx - 6) + 'px,' + (my - 6) + 'px)';
       rx += (mx - rx) * .12; ry += (my - ry) * .12;
       ring.style.transform = 'translate(' + (rx - 20) + 'px,' + (ry - 20) + 'px)';
+      // fade near top/left/right edges
+      var edgeFade = 60;
+      var fadeOpacity = Math.min(
+        my / edgeFade,
+        mx / edgeFade,
+        (window.innerWidth - mx) / edgeFade,
+        1
+      );
+      var op = Math.max(0, Math.min(1, fadeOpacity)).toFixed(3);
+      cursor.style.opacity = op;
+      ring.style.opacity = op;
     }
     animCursor();
     document.querySelectorAll('a, button, .skill-card, .hobby-card, .contact-link').forEach(el => {
@@ -1185,13 +1205,29 @@ footer {
     var text = el.textContent;
     el.innerHTML = '';
     el.classList.add('typewriter');
-    for (var i = 0; i < text.length; i++) {
-      var span = document.createElement('span');
-      span.classList.add('tw-char');
-      span.textContent = text[i] === ' ' ? '\u00a0' : text[i];
-      el.appendChild(span);
-    }
-    el.querySelectorAll('.tw-char').forEach(function(ch, idx) {
+    var words = text.split(' ');
+    var allChars = [];
+    words.forEach(function(word, wi) {
+      var wordSpan = document.createElement('span');
+      wordSpan.classList.add('tw-word');
+      for (var i = 0; i < word.length; i++) {
+        var ch = document.createElement('span');
+        ch.classList.add('tw-char');
+        ch.textContent = word[i];
+        wordSpan.appendChild(ch);
+        allChars.push(ch);
+      }
+      el.appendChild(wordSpan);
+      // space between words (except last)
+      if (wi < words.length - 1) {
+        var sp = document.createElement('span');
+        sp.classList.add('tw-char');
+        sp.textContent = '\u00a0';
+        el.appendChild(sp);
+        allChars.push(sp);
+      }
+    });
+    allChars.forEach(function(ch, idx) {
       setTimeout(function() { ch.classList.add('show'); }, idx * 12);
     });
   }
