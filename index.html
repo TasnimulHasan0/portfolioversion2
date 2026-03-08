@@ -68,7 +68,7 @@ html.light {
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
+html { overflow-x: hidden; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -1295,6 +1295,73 @@ footer {
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
     applyTheme(isLight);
   });
+
+  // ─── LERP SCROLL ───
+  (function() {
+    // Only on desktop with a mouse/wheel — don't hijack touch/trackpad inertia on mobile
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    var ease       = 0.085;   // lower = more delay (try 0.06–0.12)
+    var current    = window.scrollY;
+    var target     = window.scrollY;
+    var maxScroll  = 0;
+    var rafId      = null;
+    var isWheeling = false;
+    var wheelTimer = null;
+
+    function updateMax() {
+      maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    }
+    updateMax();
+    window.addEventListener('resize', updateMax, { passive: true });
+
+    // Intercept wheel events so WE control the target position
+    window.addEventListener('wheel', function(e) {
+      e.preventDefault();
+
+      // deltaMode 0 = pixels, 1 = lines, 2 = pages
+      var delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 40;
+      if (e.deltaMode === 2) delta *= window.innerHeight;
+
+      target += delta;
+      target  = Math.max(0, Math.min(target, maxScroll));
+
+      isWheeling = true;
+      clearTimeout(wheelTimer);
+      // After wheel stops firing, let native scrollbar/programmatic scrolls take over
+      wheelTimer = setTimeout(function() { isWheeling = false; }, 250);
+
+      if (!rafId) rafId = requestAnimationFrame(tick);
+    }, { passive: false });
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function tick() {
+      rafId = null;
+
+      if (!isWheeling) {
+        // Scrollbar drag or anchor jump — snap and stop animating
+        current = window.scrollY;
+        target  = window.scrollY;
+        return;
+      }
+
+      current = lerp(current, target, ease);
+      var diff = Math.abs(current - target);
+
+      // scrollTo keeps window.scrollY in sync so all existing scroll listeners work
+      window.scrollTo(0, current);
+
+      if (diff > 0.3) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        // Settled — snap to exact target
+        window.scrollTo(0, target);
+        current = target;
+      }
+    }
+  })();
 
   // ─── ROTATING WORDS ───
   var words = document.querySelectorAll('.word');
