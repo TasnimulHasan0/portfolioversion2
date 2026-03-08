@@ -104,10 +104,11 @@ body {
 }
 body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(74,66,201,.6); }
+#cursor { z-index: 999999; }
+#cursor-ring { z-index: 999998; }
+}
 @media (hover: hover) and (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
-}
-@media (hover: none) and (pointer: coarse) {
   #cursor, #cursor-ring { display: none !important; }
   body { cursor: auto; }
 }
@@ -713,6 +714,86 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
 }
 .email-link:hover { background: rgba(74,66,201,0.15); border-color: var(--acc1); }
 
+/* ─── EMAIL MODAL ─── */
+#email-modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99998;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#email-modal-backdrop.show { opacity: 1; pointer-events: all; }
+#email-modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -48%);
+  z-index: 99999;
+  background: var(--bg3);
+  border: 1px solid var(--border-acc);
+  border-radius: 1.2rem;
+  padding: 2rem 2rem 1.6rem;
+  width: min(92vw, 400px);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#email-modal.show {
+  opacity: 1; pointer-events: all;
+  transform: translate(-50%, -50%);
+}
+#email-modal .em-icon {
+  width: 2.6rem; height: 2.6rem;
+  background: rgba(74,66,201,0.12);
+  border: 1px solid rgba(74,66,201,0.25);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1rem; color: var(--acc2);
+}
+#email-modal h4 {
+  font-size: 1.15rem; font-weight: 800;
+  letter-spacing: 0.03em; margin-bottom: 0.5rem;
+  color: var(--acc2);
+}
+#email-modal p {
+  font-size: 0.9rem; color: var(--text-muted);
+  line-height: 1.65; margin-bottom: 1.2rem;
+}
+#email-modal .em-address {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1.2rem;
+}
+#email-modal .em-address span {
+  flex: 1; font-size: 0.95rem; font-weight: 700;
+  color: var(--acc2); letter-spacing: 0.02em;
+  user-select: all;
+}
+#email-modal .em-copy-btn {
+  background: var(--acc1); color: #fff;
+  border: none; border-radius: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.05em; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+#email-modal .em-copy-btn:hover { background: var(--acc2); transform: scale(1.04); }
+#email-modal .em-copy-btn.copied { background: #22c55e; }
+#email-modal .em-close {
+  width: 100%; background: none;
+  border: 1px solid var(--btn-ghost-border);
+  border-radius: 0.6rem; padding: 0.6rem;
+  color: var(--acc2); font-size: 0.8rem;
+  font-weight: 600; cursor: pointer; letter-spacing: 0.04em;
+  transition: border-color 0.2s, color 0.2s;
+}
+#email-modal .em-close:hover { border-color: var(--acc1); color: var(--acc3); }
+
 /* FOOTER */
 footer {
   background: var(--bg);
@@ -1087,6 +1168,20 @@ footer {
   </div>
 </footer>
 
+<div id="email-modal-backdrop"></div>
+<div id="email-modal">
+  <div class="em-icon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
+  </div>
+  <h4>No mail app detected</h4>
+  <p>It looks like your device doesn't have a default mail app set up. Copy the address below and paste it into your email client.</p>
+  <div class="em-address">
+    <span id="em-addr-text">tnhsn0@gmail.com</span>
+    <button class="em-copy-btn" id="em-copy-btn">COPY</button>
+  </div>
+  <button class="em-close" id="em-close-btn">DISMISS</button>
+</div>
+
 <script>
   // ─── CURSOR (desktop only) ───
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -1398,6 +1493,58 @@ footer {
       try { closeMobile(); } catch(err) {}
     });
   });
+
+  // ─── MAILTO FALLBACK MODAL ───
+  (function() {
+    var email   = 'tnhsn0@gmail.com';
+    var backdrop = document.getElementById('email-modal-backdrop');
+    var modal    = document.getElementById('email-modal');
+    var copyBtn  = document.getElementById('em-copy-btn');
+    var closeBtn = document.getElementById('em-close-btn');
+
+    function openModal() {
+      backdrop.classList.add('show');
+      modal.classList.add('show');
+    }
+    function closeModal() {
+      backdrop.classList.remove('show');
+      modal.classList.remove('show');
+      copyBtn.textContent = 'COPY';
+      copyBtn.classList.remove('copied');
+    }
+
+    backdrop.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    copyBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(email).then(function() {
+        copyBtn.textContent = 'COPIED!';
+        copyBtn.classList.add('copied');
+      }).catch(function() {
+        // Clipboard blocked — select the text so they can Ctrl+C
+        var sel = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(document.getElementById('em-addr-text'));
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
+    });
+
+    document.querySelectorAll('a[href="mailto:' + email + '"]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        var fallbackTimer = setTimeout(function() {
+          if (!document.hidden) openModal();
+        }, 600);
+        document.addEventListener('visibilitychange', function handler() {
+          if (document.hidden) clearTimeout(fallbackTimer);
+          document.removeEventListener('visibilitychange', handler);
+        });
+      });
+    });
+  })();
 
   // ─── ROTATING WORDS ───
   var words = document.querySelectorAll('.word');
