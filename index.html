@@ -1093,7 +1093,18 @@ footer {
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0, moved = false;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; moved = true; }, { passive: true });
+    cursor.style.opacity = '0';
+    ring.style.opacity = '0';
+    let hasEntered = false;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY; moved = true;
+      if (!hasEntered) {
+        hasEntered = true;
+        rx = e.clientX; ry = e.clientY;
+        cursor.style.opacity = '';
+        ring.style.opacity = '';
+      }
+    }, { passive: true });
     document.addEventListener('mouseleave', () => {
       cursor.style.opacity = '0'; ring.style.opacity = '0';
     });
