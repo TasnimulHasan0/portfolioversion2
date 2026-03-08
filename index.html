@@ -106,9 +106,10 @@ body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(74,66,201,.6); }
 #cursor { z-index: 999999; }
 #cursor-ring { z-index: 999998; }
-}
 @media (hover: hover) and (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
+}
+@media (hover: none) and (pointer: coarse) {
   #cursor, #cursor-ring { display: none !important; }
   body { cursor: auto; }
 }
@@ -789,7 +790,8 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
   border: 1px solid var(--btn-ghost-border);
   border-radius: 0.6rem; padding: 0.6rem;
   color: var(--acc2); font-size: 0.8rem;
-  font-weight: 600; cursor: pointer; letter-spacing: 0.04em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800; cursor: pointer; letter-spacing: 0.04em;
   transition: border-color 0.2s, color 0.2s;
 }
 #email-modal .em-close:hover { border-color: var(--acc1); color: var(--acc3); }
@@ -1496,6 +1498,8 @@ footer {
 
   // ─── MAILTO FALLBACK MODAL ───
   (function() {
+    // Only show the modal on desktop — mobile always has a mail app
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     var email   = 'tnhsn0@gmail.com';
     var backdrop = document.getElementById('email-modal-backdrop');
     var modal    = document.getElementById('email-modal');
