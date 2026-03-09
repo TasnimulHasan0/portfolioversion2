@@ -106,12 +106,11 @@ body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(74,66,201,.6); }
 #cursor { z-index: 999999; }
 #cursor-ring { z-index: 999998; }
+/* Hidden by default — JS enables them only on confirmed pointer:fine devices */
+#cursor, #cursor-ring { display: none !important; }
+body { cursor: auto; }
 @media (hover: hover) and (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
-}
-@media (hover: none) and (pointer: coarse) {
-  #cursor, #cursor-ring { display: none !important; }
-  body { cursor: auto; }
 }
 
 /* NAV */
@@ -1196,6 +1195,9 @@ footer {
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
+    // Confirmed desktop — make visible (hidden by default to prevent flash on mobile)
+    cursor.style.display = '';
+    ring.style.display = '';
     let mx = 0, my = 0, rx = 0, ry = 0, moved = false;
     cursor.style.opacity = '0';
     ring.style.opacity = '0';
