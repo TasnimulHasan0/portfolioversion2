@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tasnimul Hasan</title>
 <script>
-  // Run before CSS paints to prevent flash
+  // Set theme before paint to prevent flash — always follows OS preference
   (function() {
-    var saved = localStorage.getItem('theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var isLight = saved ? (saved === 'light') : !prefersDark;
-    if (isLight) document.documentElement.classList.add('light');
+    if (!prefersDark) document.documentElement.classList.add('light');
   })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,12 +104,11 @@ body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(74,66,201,.6); }
 #cursor { z-index: 999999; }
 #cursor-ring { z-index: 999998; }
+/* Hidden by default — JS adds .desktop-cursor to <html> only on true pointer:fine devices */
+#cursor, #cursor-ring { display: none; }
+html.desktop-cursor #cursor, html.desktop-cursor #cursor-ring { display: block; }
 @media (hover: hover) and (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
-}
-@media (hover: none) and (pointer: coarse) {
-  #cursor, #cursor-ring { display: none !important; }
-  body { cursor: auto; }
 }
 
 /* NAV */
@@ -1198,7 +1195,17 @@ footer {
 
 <script>
   // ─── CURSOR (desktop only) ───
+  // Only enable on true pointer:fine devices that have never fired a touch event
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var cursorEnabled = true;
+    // If a touchstart fires, this is a hybrid/touch device — disable cursor
+    window.addEventListener('touchstart', function() {
+      cursorEnabled = false;
+      document.documentElement.classList.remove('desktop-cursor');
+    }, { once: true, passive: true });
+
+    document.documentElement.classList.add('desktop-cursor');
+
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0, moved = false;
@@ -1476,12 +1483,14 @@ footer {
   var iconMoon = themeBtn.querySelector('.icon-moon');
   var iconSun  = themeBtn.querySelector('.icon-sun');
 
-  // Use saved preference, or fall back to OS preference
-  var saved = localStorage.getItem('theme');
   var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-  var isLight = saved ? (saved === 'light') : !prefersDark.matches;
+  // userOverride tracks a manual toggle for this session only — never persisted.
+  // This means every fresh page load always picks up the current OS theme.
+  var userOverride = null;
+  var isLight = !prefersDark.matches;
 
   function applyTheme(light) {
+    isLight = light;
     if (light) {
       document.documentElement.classList.add('light');
       iconMoon.style.display = 'block';
@@ -1494,18 +1503,14 @@ footer {
   }
   applyTheme(isLight);
 
-  // Follow OS changes only if user hasn't manually set a preference
+  // Always follow OS changes unless user has manually toggled this session
   prefersDark.addEventListener('change', function(e) {
-    if (!localStorage.getItem('theme')) {
-      isLight = !e.matches;
-      applyTheme(isLight);
-    }
+    if (userOverride === null) applyTheme(!e.matches);
   });
 
   themeBtn.addEventListener('click', function() {
-    isLight = !isLight;
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    applyTheme(isLight);
+    userOverride = !isLight;
+    applyTheme(!isLight);
   });
 
   // ─── LERP SCROLL ───
