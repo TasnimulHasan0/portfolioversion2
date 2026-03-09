@@ -473,12 +473,19 @@ section { padding: 7rem 2rem; position: relative; }
 .rev {
   opacity: 0;
   transform: translateY(32px);
-  filter: blur(10px);
+  filter: blur(6px);
+  contain: paint;
   transition: opacity 0.65s ease, transform 0.65s ease, filter 0.65s ease;
 }
 .rev.on { opacity: 1; transform: translateY(0); filter: blur(0px); }
 .d1 { transition-delay: 0.1s; } .d2 { transition-delay: 0.2s; }
 .d3 { transition-delay: 0.3s; } .d4 { transition-delay: 0.4s; } .d5 { transition-delay: 0.5s; }
+
+/* Low-end / reduced-motion: skip blur, just fade+slide */
+@media (prefers-reduced-motion: reduce) {
+  .rev { filter: none !important; transition: opacity 0.4s ease, transform 0.4s ease !important; }
+  .rev.on { filter: none !important; }
+}
 
 /* ─── TOP BLUR OVERLAY ─── */
 #top-blur-overlay {
@@ -529,7 +536,7 @@ html.light .soc-ico[style*="rgba(24,23,23"] svg { color: #222; }
 
 /* scroll-shrink sections */
 .scroll-shrink {
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
 }
 
 /* typewriter text */
@@ -1307,6 +1314,16 @@ footer {
   }, { passive: true });
 
   // ─── BLUR-IN REVEAL (enter from bottom) ───
+  var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  var lowEnd = isMobile && (
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 8)
+    || (navigator.deviceMemory && navigator.deviceMemory < 8)
+  );
+  if (lowEnd) {
+    var styleEl = document.createElement('style');
+    styleEl.textContent = '.rev,.rev.on{filter:none!important}';
+    document.head.appendChild(styleEl);
+  }
   var revEls = document.querySelectorAll('.rev');
   var ro = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
