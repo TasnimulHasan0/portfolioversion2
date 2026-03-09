@@ -106,11 +106,12 @@ body.hovering #cursor { width: 20px; height: 20px; background: var(--acc1); }
 body.hovering #cursor-ring { width: 60px; height: 60px; border-color: rgba(74,66,201,.6); }
 #cursor { z-index: 999999; }
 #cursor-ring { z-index: 999998; }
-/* Hidden by default — JS enables them only on confirmed pointer:fine devices */
-#cursor, #cursor-ring { display: none !important; }
-body { cursor: auto; }
 @media (hover: hover) and (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
+}
+@media (hover: none) and (pointer: coarse) {
+  #cursor, #cursor-ring { display: none !important; }
+  body { cursor: auto; }
 }
 
 /* NAV */
@@ -485,6 +486,11 @@ section { padding: 7rem 2rem; position: relative; }
   .rev { filter: none !important; transition: opacity 0.4s ease, transform 0.4s ease !important; }
   .rev.on { filter: none !important; }
 }
+/* Runtime benchmark decided this device can't handle blur */
+html.no-blur .rev,
+html.no-blur .rev.on           { filter: none !important; }
+html.no-blur .typewriter .tw-char { filter: none !important; }
+html.no-blur .mobile-nav a     { filter: none !important; }
 
 /* ─── TOP BLUR OVERLAY ─── */
 #top-blur-overlay {
@@ -1195,9 +1201,6 @@ footer {
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursor-ring');
-    // Confirmed desktop — make visible (hidden by default to prevent flash on mobile)
-    cursor.style.display = '';
-    ring.style.display = '';
     let mx = 0, my = 0, rx = 0, ry = 0, moved = false;
     cursor.style.opacity = '0';
     ring.style.opacity = '0';
@@ -1316,16 +1319,107 @@ footer {
   }, { passive: true });
 
   // ─── BLUR-IN REVEAL (enter from bottom) ───
-  var revEls = document.querySelectorAll('.rev');
-  var ro = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        e.target.classList.add('on');
-        ro.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.05 });
-  revEls.forEach(function(r) { ro.observe(r); });
+  // GPU benchmark runs on ALL devices.
+  // Phones: single run, 100 ms threshold.
+  // PC/Apple: 5 runs averaged to smooth out driver/scheduler spikes.
+  // IntersectionObserver starts only after decision to avoid wrong-filter flash.
+  (function() {
+    var ua    = navigator.userAgent;
+    var isPC  = window.matchMedia('(pointer:fine)').matches && !/Android/i.test(ua);
+    var cores = navigator.hardwareConcurrency || 4;
+    var ram   = navigator.deviceMemory        || 4;
+
+    function startReveal() {
+      var revEls = document.querySelectorAll('.rev');
+      var ro = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('on'); ro.unobserve(e.target); }
+        });
+      }, { threshold: 0.05 });
+      revEls.forEach(function(r) { ro.observe(r); });
+    }
+
+    function disableBlur() {
+      document.documentElement.classList.add('no-blur');
+    }
+
+    // Fast-path: obviously weak hardware → skip benchmark entirely
+    if (cores <= 4 || ram <= 2) { disableBlur(); startReveal(); return; }
+
+    setTimeout(function() {
+      var ms = (function() {
+        try {
+          var canvas = document.createElement('canvas');
+          canvas.width = 512; canvas.height = 512;
+          var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+          if (!gl) return 999;
+
+          var vsSource = 'attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0.0,1.0);}';
+          var fsSource = [
+            'precision highp float;',
+            'uniform float u_time;',
+            'void main(){',
+            '  vec2 uv=gl_FragCoord.xy/512.0;',
+            '  float v=0.0;',
+            '  for(int i=0;i<128;i++){',
+            '    float fi=float(i);',
+            '    v+=sin(uv.x*fi+u_time)*cos(uv.y*fi-u_time);',
+            '    v+=sqrt(abs(v+fi*0.01));',
+            '  }',
+            '  gl_FragColor=vec4(vec3(mod(v,1.0)),1.0);',
+            '}'
+          ].join('');
+
+          function compile(type, src) {
+            var s = gl.createShader(type);
+            gl.shaderSource(s, src); gl.compileShader(s); return s;
+          }
+          var prog = gl.createProgram();
+          gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSource));
+          gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSource));
+          gl.linkProgram(prog); gl.useProgram(prog);
+
+          var buf = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+          var loc = gl.getAttribLocation(prog, 'a_pos');
+          gl.enableVertexAttribArray(loc);
+          gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+          var uTime = gl.getUniformLocation(prog, 'u_time');
+          var px = new Uint8Array(4);
+
+          // Warm-up: let the driver compile the shader before timing
+          gl.uniform1f(uTime, 0.0);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+
+          // PC gets 5 averaged runs to smooth out scheduler spikes.
+          // Phones get 1 run to keep page load fast.
+          var runs = isPC ? 5 : 1;
+          var total = 0;
+          for (var r = 0; r < runs; r++) {
+            var t0 = performance.now();
+            for (var f = 0; f < 8; f++) {
+              gl.uniform1f(uTime, (r * 8 + f) * 0.1);
+              gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+              gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+            }
+            total += performance.now() - t0;
+          }
+
+          gl.deleteProgram(prog); gl.deleteBuffer(buf);
+          return total / runs;
+        } catch(e) { return 999; }
+      })();
+
+      console.log('[BlurCheck] GPU mean: ' + ms.toFixed(1) + ' ms | PC: ' + isPC + ' | cores: ' + cores + ' | RAM: ' + ram + ' GB');
+
+      var blurOn = ms < (isPC ? 200 : 100);
+      if (!blurOn) disableBlur();
+      startReveal();
+    }, 0);
+  })();
 
   // ─── TYPEWRITER ───
   function applyTypewriter(el) {
