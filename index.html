@@ -1314,32 +1314,6 @@ footer {
   }, { passive: true });
 
   // ─── BLUR-IN REVEAL (enter from bottom) ───
-  // Blur is ALWAYS enabled on PC (pointer:fine) and Apple devices.
-  // On Android only: disable blur if Android version <= 12,
-  // OR RAM (deviceMemory) <= 6 GB, OR CPU cores <= 6.
-  // deviceMemory API rounds to powers of 2: 6 GB phones report 4,
-  // 8 GB+ phones report 8 — so threshold of 6 is safe and precise.
-  (function() {
-    var ua        = navigator.userAgent;
-    var isAndroid = /Android/i.test(ua);
-    var isApple   = /iPhone|iPad|iPod/i.test(ua) || /Mac/i.test(ua);
-    // PC or Apple → always keep blur
-    if (!isAndroid || isApple) return;
-    // Android-specific checks
-    var verMatch   = ua.match(/Android (\d+)/i);
-    var androidVer = verMatch ? parseInt(verMatch[1], 10) : 99;
-    var ram        = navigator.deviceMemory        || 99;
-    var cores      = navigator.hardwareConcurrency || 99;
-    var disableBlur = (androidVer <= 12 || ram <= 6 || cores <= 6);
-    if (disableBlur) {
-      var styleEl = document.createElement('style');
-      styleEl.textContent =
-        '.rev,.rev.on{filter:none!important}' +
-        '.typewriter .tw-char{filter:none!important}' +
-        '.mobile-nav a{filter:none!important}';
-      document.head.appendChild(styleEl);
-    }
-  })();
   var revEls = document.querySelectorAll('.rev');
   var ro = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
