@@ -450,7 +450,7 @@ html.light .mobile-nav.open {
 
 /* SHARED SECTION */
 section { padding: 7rem 2rem; position: relative; }
-.inner { max-width: 1100px; margin: 0 auto; width: 100%; overflow: hidden; }
+.inner { max-width: 1100px; margin: 0 auto; width: 100%; }
 .lbl {
   font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em;
   text-transform: uppercase; color: var(--acc1); margin-bottom: 0.8rem; display: block;
@@ -471,7 +471,6 @@ section { padding: 7rem 2rem; position: relative; }
   opacity: 0;
   transform: translateY(32px);
   filter: blur(6px);
-  contain: paint;
   transition: opacity 0.65s ease, transform 0.65s ease, filter 0.65s ease;
 }
 .rev.on { opacity: 1; transform: translateY(0); filter: blur(0px); }
@@ -855,6 +854,13 @@ footer {
   .hero-avatar-wrap { width: 160px; height: 160px; }
   .chips { display: grid; grid-template-columns: 1fr 1fr; flex-direction: unset; }
   .chip { font-size: 0.75rem; padding: 0.55rem 0.6rem; }
+}
+
+/* ─── MOBILE PERFORMANCE ─── */
+@media (hover: none), (pointer: coarse) {
+  .hero-blob { display: none; }
+  .grad { animation: none; }
+  .hero-orbit { animation: none; }
 }
 </style>
 </head>
@@ -1468,7 +1474,7 @@ footer {
 
       console.log('[BlurCheck] GPU mean: ' + ms.toFixed(1) + ' ms | PC: ' + isPC + ' | cores: ' + cores + ' | RAM: ' + ram + ' GB');
 
-      var blurOn = ms < (isPC ? 200 : 100);
+      var blurOn = ms < (isPC ? 200 : 60);
       if (!blurOn) disableBlur();
       startReveal();
     }, 0);
@@ -1486,7 +1492,7 @@ footer {
     words[cur].classList.add('active');
   }, 2500);
 
-  // ─── TYPEWRITER ───
+  // ─── TYPEWRITER (desktop only) ───
   function applyTypewriter(el) {
     var text = el.textContent;
     el.innerHTML = '';
@@ -1504,7 +1510,6 @@ footer {
         allChars.push(ch);
       }
       el.appendChild(wordSpan);
-      // space between words (except last)
       if (wi < words.length - 1) {
         var sp = document.createElement('span');
         sp.classList.add('tw-char');
@@ -1518,12 +1523,15 @@ footer {
     });
   }
   var twEls = document.querySelectorAll('.tw');
-  var two = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { applyTypewriter(e.target); two.unobserve(e.target); }
-    });
-  }, { threshold: 0.3 });
-  twEls.forEach(function(el) { two.observe(el); });
+  var isTouch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!isTouch) {
+    var two = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { applyTypewriter(e.target); two.unobserve(e.target); }
+      });
+    }, { threshold: 0.3 });
+    twEls.forEach(function(el) { two.observe(el); });
+  }
 
   // ─── PROFILE PHOTO (jpg only) ───
   var profileImg = new Image();
@@ -1703,19 +1711,13 @@ footer {
       });
     });
 
-    document.querySelectorAll('a[href="mailto:' + email + '"]').forEach(function(link) {
-      link.addEventListener('click', function() {
-        var fallbackTimer = setTimeout(function() {
-          if (!document.hidden) openModal();
-        }, 600);
-        document.addEventListener('visibilitychange', function handler() {
-          if (document.hidden) clearTimeout(fallbackTimer);
-          document.removeEventListener('visibilitychange', handler);
-        });
+    document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        openModal();
       });
     });
   })();
-
 </script>
 </body>
 </html>
