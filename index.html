@@ -6,10 +6,20 @@
 <meta name="theme-color" id="theme-color-meta" content="#05040e">
 <title>Tasnimul Hasan</title>
 <script>
-  // Set theme before paint to prevent flash — always follows OS preference
+  // Restore saved theme before paint to prevent flash
   (function() {
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (!prefersDark) document.documentElement.classList.add('light');
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch(e) {}
+    if (saved === 'light') {
+      document.documentElement.classList.add('light');
+    } else if (saved === 'dark') {
+      // explicit dark — do nothing
+    } else {
+      // No saved pref — follow OS
+      if (!window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('light');
+      }
+    }
   })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,7 +79,7 @@ html.light {
   --nav-cta-text:  #4a42c9;
   --glass-bg:      rgba(200, 195, 255, 0.35);
   --glass-border:  rgba(100, 90, 180, 0.15);
-  --glass-blur:    blur(8px) saturate(120%);
+  --glass-blur:    blur(4px) saturate(120%);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -167,8 +177,8 @@ nav.scrolled .nav-inner {
   background-image: radial-gradient(circle, rgba(0,0,0,0) 2px, var(--nav-bg) 2px);
   background-size: 7px 7px;
   border: 1px solid rgba(74,66,201,0.22) !important;
-  -webkit-backdrop-filter: blur(18px) brightness(1.4) saturate(140%);
-  backdrop-filter: blur(18px) brightness(1.4) saturate(140%);
+  -webkit-backdrop-filter: blur(15px) brightness(1.4) saturate(140%);
+  backdrop-filter: blur(15px) brightness(1.4) saturate(140%);
   box-shadow: 0 4px 32px rgba(74,66,201,0.45), 0 0 64px rgba(107,101,212,0.22), 0 1px 0 rgba(107,101,212,0.28) inset, 0 -1px 0 rgba(74,66,201,0.12) inset;
 }
 
@@ -230,10 +240,10 @@ nav.scrolled .nav-right { transform: translateX(0); }
 .theme-btn svg, .menu-btn svg { display: block; }
 @keyframes navOpen {
   from { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: transparent; }
-  to   { opacity: 1; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+  to   { opacity: 1; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 }
 @keyframes navClose {
-  from { opacity: 1; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+  from { opacity: 1; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
   to   { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: transparent; }
 }
 .mobile-nav {
@@ -250,8 +260,8 @@ nav.scrolled .nav-right { transform: translateX(0); }
 .mobile-nav.open {
   opacity: 1;
   background: rgba(5,5,8,0.55);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(6px) saturate(160%);
+  backdrop-filter: blur(6px) saturate(160%);
   pointer-events: all;
   animation: navOpen 0.35s ease forwards;
 }
@@ -455,17 +465,29 @@ html.light .badge {
   -webkit-backdrop-filter: blur(2px) saturate(105%);
   backdrop-filter: blur(2px) saturate(105%);
 }
+.btn-g::after {
+  content: ''; position: absolute; inset: -1px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(74,66,201,0.35), 0 0 0 2px var(--acc2);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+}
 html.light .btn-g {
   background: rgba(207,201,255,0.15);
   border-color: rgba(147,130,255,0.4);
   -webkit-backdrop-filter: blur(2px) saturate(105%);
   backdrop-filter: blur(2px) saturate(105%);
 }
+html.light .btn-g::after {
+  box-shadow: 0 8px 20px rgba(74,66,201,0.16), 0 0 0 2px var(--acc1);
+}
 .btn-g:hover {
   border-color: var(--acc2);
   background: rgba(74,66,201,0.18);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 24px rgba(74,66,201,0.2);
 }
+.btn-g:hover::after { opacity: 1; }
+.btn-g:active::after { opacity: 0.55; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); filter: blur(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -588,9 +610,9 @@ html.no-blur .mobile-nav a     { filter: none !important; }
   mask-image: linear-gradient(to bottom, black var(--_ms), transparent var(--_me));
 }
 /* Band 1: strong blur, top ~66 px */
-.nbl-b1 { --_blur: blur(18px); --_ms: 0%; --_me: 100%; top: 0; height: 66px; }
+.nbl-b1 { --_blur: blur(15px); --_ms: 0%; --_me: 100%; top: 0; height: 66px; }
 /* Band 2: medium blur, covers 0–90 px */
-.nbl-b2 { --_blur: blur(10px); --_ms: 0%; --_me: 100%; top: 0; height: 90px; }
+.nbl-b2 { --_blur: blur(7px); --_ms: 0%; --_me: 100%; top: 0; height: 90px; }
 /* Band 3: soft blur, covers 10–105 px */
 .nbl-b3 { --_blur: blur(5px);  --_ms: 0%; --_me: 100%; top: 10px; height: 95px; }
 /* Band 4: feather blur, covers 35–110 px */
@@ -606,8 +628,8 @@ html.light nav.scrolled .nav-inner {
   box-shadow: 0 4px 32px rgba(147,130,255,0.38), 0 0 64px rgba(196,188,255,0.25), 0 1px 0 rgba(207,201,255,0.55) inset;
   background-color: rgba(207,201,255,0.38) !important;
   border: 1px solid rgba(147,130,255,0.35) !important;
-  -webkit-backdrop-filter: blur(18px) brightness(1.05);
-  backdrop-filter: blur(18px) brightness(1.05);
+  -webkit-backdrop-filter: blur(15px) brightness(1.05);
+  backdrop-filter: blur(15px) brightness(1.05);
 }
 /* Light theme — #C4BCFF accent on nav links */
 html.light .nav-links a:hover { color: #C4BCFF !important; }
@@ -638,7 +660,7 @@ html.light .telegram-ico { background: rgba(0,119,181,0.15) !important; }
 .mobile-nav, section,
 .cta-box, .about-card, .chip, .tag, .mq-wrap, .rings,
 .rot, footer, .email-link, .btn-g {
-  transition: background 0.08s ease, border-color 0.08s ease, color 0.08s ease, box-shadow 0.08s ease;
+  transition: background 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
 }
 /* scroll-shrink sections */
 .scroll-shrink {
@@ -683,8 +705,25 @@ html.light .telegram-ico { background: rgba(0,119,181,0.15) !important; }
   border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.78rem;
   color: var(--acc2); text-align: left; display: flex; align-items: center; gap: 0.5rem;
   font-weight: 600;
+  position: relative;
   transform: translateZ(0);
+  transition: transform 0.4s cubic-bezier(0.34,1.3,0.64,1);
+  cursor: default;
 }
+.chip::after {
+  content: ''; position: absolute; inset: -1px;
+  border-radius: 9px;
+  box-shadow: 0 6px 18px rgba(74,66,201,0.28), 0 0 0 2px var(--acc2);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+html.light .chip::after {
+  box-shadow: 0 6px 16px rgba(74,66,201,0.16), 0 0 0 2px var(--acc1);
+}
+.chip:hover  { transform: translateY(-3px); }
+.chip:hover::after { opacity: 1; }
+.chip:active { transform: translateY(-1px); transition: transform 0.1s; }
+.chip:active::after { opacity: 0.55; }
 .about-p { color: var(--text-muted); line-height: 1.85; margin-bottom: 1.2rem; font-size: 0.95rem; overflow-wrap: break-word; word-break: break-word; max-width: 100%; }
 
 /* SKILLS */
@@ -886,8 +925,8 @@ html.light .hob-card::after, html.light .sk-card::after { box-shadow: 0 8px 20px
   transform: translate(-50%, -48%);
   z-index: 99999;
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(4px) saturate(120%);
+  backdrop-filter: blur(4px) saturate(120%);
   border: 1px solid var(--border-acc);
   border-radius: 1.4rem;
   padding: 1.8rem;
@@ -1086,8 +1125,8 @@ html.light .rings { background: transparent !important; }
 .mq-wrap {
   background: var(--glass-bg) !important;
   border-color: var(--glass-border) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
-  backdrop-filter: blur(8px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(120%) !important;
+  backdrop-filter: blur(4px) saturate(120%) !important;
 }
 
 html.no-blur .mq-wrap {
@@ -1108,8 +1147,8 @@ footer {
   padding: 2.5rem 3rem;
   position: relative;
   transform: translateZ(0);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(4px) saturate(120%);
+  backdrop-filter: blur(4px) saturate(120%);
 }
 
 html.no-blur #about .inner {
@@ -1136,8 +1175,8 @@ html.light #about .chip {
   margin-top: 3rem;
   position: relative;
   transform: translateZ(0);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(4px) saturate(120%);
+  backdrop-filter: blur(4px) saturate(120%);
 }
 
 html.no-blur .skills-panel {
@@ -1183,8 +1222,8 @@ html.light .skills-panel .sk-card {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(4px) saturate(120%);
+  backdrop-filter: blur(4px) saturate(120%);
   z-index: -1;
   pointer-events: none;
 }
@@ -1211,8 +1250,8 @@ html.light .hobbies-panel .hob-card {
   margin-top: 2rem;
   position: relative;
   transform: translateZ(0);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(4px) saturate(120%);
+  backdrop-filter: blur(4px) saturate(120%);
 }
 
 html.no-blur .contact-panel {
@@ -1573,11 +1612,11 @@ html.light #email-modal {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card rev d1" href="mailto:tnhsn0@gmail.com">
+        <a class="soc-card rev d1" href="/cdn-cgi/l/email-protection#b5c1dbddc6db85f5d2d8d4dcd99bd6dad8">
           <div class="soc-ico" style="background:rgba(209,72,54,.32)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#ea4335"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="ef9b81879c81dfaf88828e8683c18c8082">[email&#160;protected]</span></div></div>
         </a>
 
         <a class="soc-card rev d2" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -1612,9 +1651,9 @@ html.light #email-modal {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="mailto:tnhsn0@gmail.com" class="email-link">
+        <a href="/cdn-cgi/l/email-protection#790d17110a1749391e14181015571a1614" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          tnhsn0@gmail.com
+          <span class="__cf_email__" data-cfemail="abdfc5c3d8c59bebccc6cac2c785c8c4c6">[email&#160;protected]</span>
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -1641,13 +1680,13 @@ html.light #email-modal {
   <h4>No mail app detected</h4>
   <p>It looks like your device doesn't have a default mail app set up. Copy the address below and paste it into your email client.</p>
   <div class="em-address">
-    <span id="em-addr-text">tnhsn0@gmail.com</span>
+    <span id="em-addr-text"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7a0e141209144a3a1d171b131654191517">[email&#160;protected]</a></span>
     <button class="em-copy-btn" id="em-copy-btn">COPY</button>
   </div>
   <button class="em-close" id="em-close-btn">DISMISS</button>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ─── CURSOR (desktop only) ───
   // Only enable on true pointer:fine devices that have never fired a touch event
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -2020,10 +2059,11 @@ html.light #email-modal {
   var iconSun  = themeBtn.querySelector('.icon-sun');
 
   var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-  // userOverride tracks a manual toggle for this session only — never persisted.
-  // This means every fresh page load always picks up the current OS theme.
-  var userOverride = null;
-  var isLight = !prefersDark.matches;
+  // Restore saved preference; fall back to OS if none saved
+  var _savedTheme = null;
+  try { _savedTheme = localStorage.getItem('theme'); } catch(e) {}
+  var userOverride = _savedTheme ? (_savedTheme === 'light') : null;
+  var isLight = _savedTheme ? (_savedTheme === 'light') : !prefersDark.matches;
 
   function applyTheme(light) {
     isLight = light;
@@ -2048,8 +2088,9 @@ html.light #email-modal {
   });
 
   themeBtn.addEventListener('click', function() {
-    userOverride = !isLight;
     applyTheme(!isLight);
+    userOverride = isLight;
+    try { localStorage.setItem('theme', isLight ? 'light' : 'dark'); } catch(e) {}
   });
 
   // ─── LERP SCROLL ───
@@ -2523,6 +2564,7 @@ html.light #email-modal {
 
   /* ══ RENDER LOOP ══ */
   var t0=null, _lastFt=0, _FI=1000/30; /* cap to 30 fps — imperceptible for a bg */
+  var _transitioning = false;
   var _paused = false;
   document.addEventListener('visibilitychange', function() {
     _paused = document.hidden;
@@ -2536,7 +2578,10 @@ html.light #email-modal {
     var t=(ts-t0)/1000;
 
     /* smooth theme transition ~25 frames */
+    var prevLerp = themeLerp;
     themeLerp += (themeTarget-themeLerp)*0.14;
+    var moving = Math.abs(themeLerp - prevLerp) > 0.001;
+    _FI = moving ? 1000/60 : 1000/30;
 
     var C=getC(themeLerp);
 
@@ -2552,5 +2597,62 @@ html.light #email-modal {
   requestAnimationFrame(frame);
 })();
 </script>
-</body>
-</html>
+<script>
+/* ── VIEWPORT-GATED PANEL BLUR ──────────────────────────────────────────────
+   Parent glass panels are expensive (backdrop-filter runs every frame).
+   We only pay the cost when the panel is actually visible in the viewport.
+   When scrolled out of view the blur is set to none; restored on re-entry.
+   Uses a small rootMargin so the blur kicks in just before the panel
+   reaches the viewport edge (no visible pop-in).
+   ─────────────────────────────────────────────────────────────────────── */
+(function () {
+  var BLUR_VAL = 'blur(4px) saturate(120%)';
+  var PANELS   = [
+    '#about .inner',
+    '.skills-panel',
+    '.hobbies-panel',
+    '.contact-panel',
+    '.mq-wrap',
+    '#email-modal'
+  ];
+
+  // hobbies-panel is special — blur lives on ::before via CSS, so we
+  // toggle a class rather than inline style to control it.
+  var CSS_CLASS_PANELS = ['.hobbies-panel'];
+
+  // Inject a helper class for hobbies ::before toggling
+  var style = document.createElement('style');
+  style.textContent = '.hobbies-panel.blur-off::before { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }';
+  document.head.appendChild(style);
+
+  function enable(el) {
+    if (el.classList.contains('hobbies-panel')) {
+      el.classList.remove('blur-off');
+    } else {
+      el.style.webkitBackdropFilter = BLUR_VAL;
+      el.style.backdropFilter       = BLUR_VAL;
+    }
+  }
+
+  function disable(el) {
+    if (el.classList.contains('hobbies-panel')) {
+      el.classList.add('blur-off');
+    } else {
+      el.style.webkitBackdropFilter = 'none';
+      el.style.backdropFilter       = 'none';
+    }
+  }
+
+  // Skip on no-blur devices — they already have blur stripped globally
+  if (document.documentElement.classList.contains('no-blur')) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        enable(e.target);
+      } else {
+        disable(e.target);
+      }
+    });
+  }, {
+    rootMargin: '80px 0px 80px 0px
