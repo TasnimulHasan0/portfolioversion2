@@ -1612,11 +1612,11 @@ html.light #email-modal {
           <div><div class="soc-lbl">GitHub</div><div class="soc-user">TasnimulHasan0</div></div>
         </a>
 
-        <a class="soc-card rev d1" href="/cdn-cgi/l/email-protection#b5c1dbddc6db85f5d2d8d4dcd99bd6dad8">
+        <a class="soc-card rev d1" href="mailto:tnhsn0@gmail.com">
           <div class="soc-ico" style="background:rgba(209,72,54,.32)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#ea4335"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
           </div>
-          <div><div class="soc-lbl">Email</div><div class="soc-user"><span class="__cf_email__" data-cfemail="ef9b81879c81dfaf88828e8683c18c8082">[email&#160;protected]</span></div></div>
+          <div><div class="soc-lbl">Email</div><div class="soc-user">tnhsn0@gmail.com</div></div>
         </a>
 
         <a class="soc-card rev d2" href="https://www.facebook.com/tnhsn0" target="_blank" rel="noopener noreferrer">
@@ -1651,9 +1651,9 @@ html.light #email-modal {
       <div class="cta-box rev d2">
         <h3>Got something<br><span class="hl">in mind?</span></h3>
         <p>I'm always happy to connect, whether it's about tech, Android, coding projects, or just a chat. Reach out through any of the links or send me a direct email.</p>
-        <a href="/cdn-cgi/l/email-protection#790d17110a1749391e14181015571a1614" class="email-link">
+        <a href="mailto:tnhsn0@gmail.com" class="email-link">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.971l-11.986 9.713zm-5.425-1.822l-6.575-5.329v12.501l6.575-7.172zm10.85 0l6.575 7.172v-12.501l-6.575 5.329zm-1.557 1.261l-3.868 3.135-3.868-3.135-8.11 8.848h23.956l-8.11-8.848z"/></svg>
-          <span class="__cf_email__" data-cfemail="abdfc5c3d8c59bebccc6cac2c785c8c4c6">[email&#160;protected]</span>
+          tnhsn0@gmail.com
         </a>
         <a href="https://github.com/TasnimulHasan0" target="_blank" rel="noopener noreferrer" class="btn-p" style="text-align:center">View GitHub Profile</a>
       </div>
@@ -1680,7 +1680,7 @@ html.light #email-modal {
   <h4>No mail app detected</h4>
   <p>It looks like your device doesn't have a default mail app set up. Copy the address below and paste it into your email client.</p>
   <div class="em-address">
-    <span id="em-addr-text"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7a0e141209144a3a1d171b131654191517">[email&#160;protected]</a></span>
+    <span id="em-addr-text">tnhsn0@gmail.com</span>
     <button class="em-copy-btn" id="em-copy-btn">COPY</button>
   </div>
   <button class="em-close" id="em-close-btn">DISMISS</button>
@@ -2162,7 +2162,16 @@ html.light #email-modal {
       var section = document.getElementById(id);
       if (!section) return;
       e.preventDefault();
+      // content-visibility:auto gives off-screen sections a placeholder height,
+      // making getBoundingClientRect() report wrong positions on first load.
+      // Force real layout on all CV sections before measuring.
+      var cvSections = document.querySelectorAll('#about, #skills, #hobbies, #contact');
+      cvSections.forEach(function(s) { s.style.contentVisibility = 'visible'; });
       var y = Math.max(0, section.getBoundingClientRect().top + window.scrollY - 80);
+      // Restore content-visibility after the browser has committed the scroll
+      requestAnimationFrame(function() {
+        cvSections.forEach(function(s) { s.style.contentVisibility = ''; });
+      });
       // Already there — do nothing, avoids scroll-shrink flicker
       if (Math.abs(y - window.scrollY) < 8) return;
       if (window.lerpScrollTo) {
