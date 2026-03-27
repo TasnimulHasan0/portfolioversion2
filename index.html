@@ -48,13 +48,14 @@ a { outline:none; -webkit-tap-highlight-color:transparent; }
    BACKGROUND — FIXED PHOTO + OVERLAY
 ══════════════════════════════════════════ */
 #bg-photo {
-  position:fixed; inset:0; z-index:-2;
+  position:fixed; top:0; left:0;
+  width:100%; z-index:-2;
   background:url('image-3.jpg') center/cover no-repeat;
 }
 #bg-overlay {
-  position:fixed; inset:0; z-index:-1;
+  position:fixed; top:0; left:0;
+  width:100%; z-index:-1;
   background:var(--overlay);
-  height:100vh; height:100lvh;
 }
 
 /* ══════════════════════════════════════════
@@ -1119,6 +1120,28 @@ footer {
 </div>
 
 <script>
+/* ── BACKGROUND LOCK (mobile address-bar jump fix) ── */
+(function() {
+  var h = Math.max(window.screen.height, window.innerHeight);
+  function lockBg() {
+    var s = h + 'px';
+    var photo   = document.getElementById('bg-photo');
+    var overlay = document.getElementById('bg-overlay');
+    if (photo)   photo.style.height   = s;
+    if (overlay) overlay.style.height = s;
+  }
+  lockBg();
+  /* Re-lock only on true orientation change, not address-bar collapse */
+  var lastW = window.innerWidth;
+  window.addEventListener('resize', function() {
+    if (window.innerWidth !== lastW) {
+      lastW = window.innerWidth;
+      h = Math.max(window.screen.height, window.innerHeight);
+      lockBg();
+    }
+  }, { passive: true });
+})();
+
 /* ── LERP SCROLL ── */
 (function() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
