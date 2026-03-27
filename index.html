@@ -24,7 +24,7 @@
   --border-str:  rgba(255,255,255,0.22);
   --acc:         #7c6fe0;
   --acc-dim:     rgba(124,111,224,0.10);
-  --overlay:     rgba(6,6,8,0.82);
+  --overlay:     rgba(6,6,8,0.74);
 }
 
 /* ══════════════════════════════════════════
@@ -54,6 +54,7 @@ a { outline:none; -webkit-tap-highlight-color:transparent; }
 #bg-overlay {
   position:fixed; inset:0; z-index:-1;
   background:var(--overlay);
+  height:100vh; height:100lvh;
 }
 
 /* ══════════════════════════════════════════
@@ -576,19 +577,29 @@ footer {
    EMAIL MODAL
 ══════════════════════════════════════════ */
 #email-modal-backdrop {
-  position:fixed; inset:0; background:rgba(0,0,0,.82);
-  z-index:999; display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.72);
+  z-index:999;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.32s ease;
 }
-#email-modal-backdrop.open { display:block; }
+#email-modal-backdrop.open {
+  opacity:1; pointer-events:all;
+}
 #email-modal {
   position:fixed; top:50%; left:50%;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%, -46%);
   z-index:1000; background:var(--surface-2);
   border:1px solid var(--border-str);
   padding:2.5rem; width:90%; max-width:400px;
-  display:none; flex-direction:column; gap:1.2rem;
+  display:flex; flex-direction:column; gap:1.2rem;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.32s ease, transform 0.32s cubic-bezier(.22,1,.36,1);
 }
-#email-modal.open { display:flex; }
+#email-modal.open {
+  opacity:1; pointer-events:all;
+  transform:translate(-50%, -50%);
+}
 .em-icon {
   width:36px; height:36px;
   display:flex; align-items:center; justify-content:center;
@@ -1223,55 +1234,64 @@ var io = new IntersectionObserver(function(entries) {
 revEls.forEach(function(el) { io.observe(el); });
 
 /* ── EMAIL LINKS ── */
-var backdrop = document.getElementById('email-modal-backdrop');
-var modal    = document.getElementById('email-modal');
-var copyBtn  = document.getElementById('em-copy-btn');
-var closeBtn = document.getElementById('em-close-btn');
+(function() {
+  /* Desktop only — mobile always has a native mail app */
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-function openEmailModal(e) {
-  var mailto = 'mailto:tnhsn0@gmail.com';
-  var a = document.createElement('a');
-  a.href = mailto; a.style.display = 'none';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(function() {
-    if (document.hasFocus()) {
-      backdrop.classList.add('open'); modal.classList.add('open');
-    }
-  }, 500);
-  e.preventDefault();
-}
+  var backdrop = document.getElementById('email-modal-backdrop');
+  var modal    = document.getElementById('email-modal');
+  var copyBtn  = document.getElementById('em-copy-btn');
+  var closeBtn = document.getElementById('em-close-btn');
+  var addr     = 'tnhsn0@gmail.com';
 
-var emailLink = document.getElementById('emailLink');
-var emailLinkCta = document.getElementById('emailLinkCta');
-if (emailLink) emailLink.addEventListener('click', openEmailModal);
-if (emailLinkCta) emailLinkCta.addEventListener('click', openEmailModal);
-
-function closeEmailModal() {
-  backdrop.classList.remove('open');
-  modal.classList.remove('open');
-}
-
-if (closeBtn) closeBtn.addEventListener('click', closeEmailModal);
-if (backdrop) backdrop.addEventListener('click', closeEmailModal);
-
-if (copyBtn) copyBtn.addEventListener('click', function() {
-  var addr = 'tnhsn0@gmail.com';
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(addr).then(function() {
-      copyBtn.textContent = 'COPIED!';
-      setTimeout(function() { copyBtn.textContent = 'COPY'; }, 2000);
-    });
-  } else {
-    var ta = document.createElement('textarea');
-    ta.value = addr;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); copyBtn.textContent = 'COPIED!'; setTimeout(function() { copyBtn.textContent = 'COPY'; }, 2000); } catch(err) {}
-    document.body.removeChild(ta);
+  function openEmailModal() {
+    backdrop.classList.add('open');
+    modal.classList.add('open');
   }
-});
+  function closeEmailModal() {
+    backdrop.classList.remove('open');
+    modal.classList.remove('open');
+    if (copyBtn) { copyBtn.textContent = 'COPY'; }
+  }
+
+  if (closeBtn)  closeBtn.addEventListener('click', closeEmailModal);
+  if (backdrop)  backdrop.addEventListener('click', closeEmailModal);
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeEmailModal();
+  });
+
+  if (copyBtn) copyBtn.addEventListener('click', function() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(addr).then(function() {
+        copyBtn.textContent = 'COPIED!';
+        setTimeout(function() { copyBtn.textContent = 'COPY'; }, 2000);
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = addr; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); copyBtn.textContent = 'COPIED!';
+        setTimeout(function() { copyBtn.textContent = 'COPY'; }, 2000); } catch(err) {}
+      document.body.removeChild(ta);
+    }
+  });
+
+  function interceptMailto(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var t = Date.now();
+      window.location.href = 'mailto:' + addr;
+      setTimeout(function() {
+        if (Date.now() - t < 1000 && !document.hidden) openEmailModal();
+      }, 500);
+    });
+  }
+
+  var emailLink    = document.getElementById('emailLink');
+  var emailLinkCta = document.getElementById('emailLinkCta');
+  if (emailLink)    interceptMailto(emailLink);
+  if (emailLinkCta) interceptMailto(emailLinkCta);
+})();
 
 </script>
 </body>
