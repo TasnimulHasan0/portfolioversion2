@@ -181,8 +181,9 @@ nav.scrolled {
 ══════════════════════════════════════════ */
 .hero {
   min-height:100vh;
+  min-height:100svh;
   display:grid;
-  grid-template-rows:1fr auto;
+  grid-template-rows:auto 1fr;
   padding:0;
   position:relative;
 }
@@ -192,19 +193,21 @@ nav.scrolled {
   grid-template-columns:1fr 1fr;
   grid-template-rows:1fr auto;
   padding:0;
-  min-height:calc(100vh - 52px);
 }
 .hero-left {
   grid-column:1; grid-row:1/3;
-  display:flex; flex-direction:column; justify-content:flex-end;
-  padding:5rem 3.5rem 5rem 3rem;
+  display:flex; flex-direction:column; justify-content:flex-start;
+  padding:1.75rem 3.5rem 3rem 3rem;
   border-right:1px solid var(--border-mid);
   opacity:0; animation:fadeIn .9s .1s ease both;
+}
+.hero-copy {
+  width:100%;
 }
 .hero-eyebrow {
   font-family:'IBM Plex Mono', monospace; font-size:.62rem; font-weight:400;
   color:var(--acc); letter-spacing:.25em; text-transform:uppercase;
-  margin-bottom:2rem;
+  margin-bottom:1.5rem;
   display:flex; align-items:center; gap:1.2rem;
 }
 .hero-eyebrow::before {
@@ -220,12 +223,12 @@ nav.scrolled {
 .hero h1 em { font-style:italic; color:var(--acc); }
 .hero-divider {
   width:100%; height:1px; background:var(--border-str);
-  margin:2.5rem 0;
+  margin:2rem 0;
 }
 .hero-sub {
   font-family:'IBM Plex Mono', monospace;
   font-size:.78rem; color:var(--text-muted);
-  max-width:480px; line-height:1.9; margin-bottom:3rem;
+  max-width:480px; line-height:1.9; margin-bottom:2.25rem;
   font-weight:300;
 }
 .hero-btns {
@@ -426,7 +429,7 @@ section { padding:8rem 3rem; position:relative; }
 .sk-card {
   background:var(--surface);
   padding:2.5rem 1.5rem 2rem;
-  display:flex; flex-direction:column; align-items:flex-start; gap:1rem;
+  display:flex; flex-direction:column; align-items:center; gap:1rem;
   transition:background .2s;
   border-right:1px solid transparent;
 }
@@ -436,6 +439,7 @@ section { padding:8rem 3rem; position:relative; }
 .sk-name {
   font-family:'IBM Plex Mono', monospace; font-size:.6rem; font-weight:500;
   color:var(--text-muted); letter-spacing:.08em; text-transform:uppercase;
+  text-align:center;
 }
 
 /* ══════════════════════════════════════════
@@ -660,13 +664,29 @@ footer {
 .rev.d5 { transition-delay:.35s; }
 
 /* ══════════════════════════════════════════
+   MOBILE AVATAR (inline with name)
+══════════════════════════════════════════ */
+.hero-name-row {
+  display:flex; align-items:flex-start; gap:0;
+}
+.hero-avatar-inline { display:none; flex-shrink:0; margin-left:3rem; margin-top:.4rem; }
+.hero-avatar-inline .hero-avatar-frame { width:120px; height:120px; }
+
+/* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
 @media (max-width:1100px) {
-  .hero-body { grid-template-columns:1fr; }
-  .hero-left { border-right:none; grid-column:1; grid-row:auto; }
+  .hero-body {
+    grid-template-columns:1fr;
+    grid-template-rows:auto;
+    min-height:calc(100vh - 52px);
+    min-height:calc(100svh - 52px);
+  }
+  .hero-left { border-right:none; grid-column:1; grid-row:auto; padding:1rem 2rem 1.75rem; }
+  .hero-copy { margin-block:auto; transform:translateY(-1.9rem); }
   .hero-right { display:none; }
   .hero-bottom { display:none; }
+  .hero-avatar-inline { display:flex; }
   .about-grid { grid-template-columns:1fr; }
   .about-left { position:static; border-right:none; padding-right:0; border-bottom:1px solid var(--border); padding-bottom:3rem; margin-bottom:3rem; }
   .about-right { padding-left:0; }
@@ -679,7 +699,11 @@ footer {
   .nav-right { display:none; }
   .menu-btn { display:flex; }
   section { padding:5rem 1.5rem; }
-  .hero-left { padding:4rem 1.5rem; }
+  .hero-left { padding:.85rem 1.5rem 1.5rem; justify-content:flex-start; }
+  .hero-copy { transform:translateY(-1.35rem); }
+  .hero-sub { margin-bottom:2rem; }
+  .hero-avatar-inline { margin-left:2.4rem; }
+  .hero-avatar-inline .hero-avatar-frame { width:100px; height:100px; }
   .hob-grid { grid-template-columns:1fr 1fr; }
   .foot-inner { grid-template-columns:1fr; height:auto; }
   .foot-logo { padding:1.2rem 1.5rem; border-right:none; border-bottom:1px solid var(--border); }
@@ -688,6 +712,9 @@ footer {
 @media (max-width:520px) {
   .hob-grid { grid-template-columns:1fr; }
   .hero h1 { font-size:clamp(4rem,14vw,6rem); }
+  .hero-copy { transform:translateY(-1rem); }
+  .hero-avatar-inline { margin-left:2rem; }
+  .hero-avatar-inline .hero-avatar-frame { width:80px; height:80px; }
 }
 </style>
 </head>
@@ -729,13 +756,24 @@ footer {
   <div class="hero-spacer"></div>
   <div class="hero-body">
     <div class="hero-left">
+      <div class="hero-copy">
       <div class="hero-eyebrow">Developer &amp; Android Enthusiast — Bangladesh</div>
-      <h1>Tasnimul<br><em>Hasan.</em></h1>
+      <div class="hero-name-row">
+        <h1>Tasnimul<br><em>Hasan.</em></h1>
+        <div class="hero-avatar-inline">
+          <div class="hero-avatar-frame">
+            <img src="profile.jpg" alt="Tasnimul Hasan" class="avatar-img"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="avatar-fallback-b" style="display:none">TH</div>
+          </div>
+        </div>
+      </div>
       <div class="hero-divider"></div>
       <p class="hero-sub">College student obsessed with Android internals, custom ROMs, and building things that actually work. Somewhere between a developer and a relentless tinkerer.</p>
       <div class="hero-btns">
         <a href="#about" class="btn-p">About Me</a>
         <a href="#contact" class="btn-g">Get In Touch</a>
+      </div>
       </div>
     </div>
     <div class="hero-right">
