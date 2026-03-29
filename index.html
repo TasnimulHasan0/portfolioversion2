@@ -231,6 +231,8 @@ nav.scrolled {
   max-width:480px; line-height:1.9; margin-bottom:2.25rem;
   font-weight:300;
 }
+.hero-sub-br { display:none; }
+.hero-sub-copy-fold { display:none; }
 .hero-btns {
   display:flex; gap:0; flex-wrap:wrap;
 }
@@ -789,6 +791,7 @@ footer {
   .hero h1 { font-size:clamp(4rem,14vw,6rem); }
   .hero-copy { transform:translateY(-1rem); }
   .hero-sub { max-width:330px; }
+  .hero-sub-br { display:block; }
   .hero-avatar-inline { margin-left:2rem; }
   .hero-avatar-inline .hero-avatar-frame {
     width:clamp(100px, 31vw, 118px);
@@ -798,26 +801,11 @@ footer {
 @media (max-width:430px) {
   .hero-left { padding:.85rem 1rem 1.35rem; }
   .hero-copy { transform:translateY(-.7rem); }
-  .hero-eyebrow {
-    gap:.85rem;
-    font-size:.56rem;
-    letter-spacing:.18em;
-  }
-  .hero-eyebrow::before { width:18px; }
   .hero-name-row {
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
     align-items:start;
     column-gap:.9rem;
-  }
-  .hero h1 {
-    font-size:clamp(3.35rem, 17vw, 4.6rem);
-    line-height:.9;
-  }
-  .hero-sub {
-    max-width:none;
-    font-size:.72rem;
-    line-height:1.85;
   }
   .hero-avatar-inline {
     margin-left:0;
@@ -830,17 +818,24 @@ footer {
   }
   .hero-btns {
     display:flex;
-    flex-wrap:nowrap;
-    width:fit-content;
-    max-width:100%;
-  }
-  .hero-btns .btn-p,
-  .hero-btns .btn-g {
+    gap:0;
+    flex-wrap:wrap;
     width:auto;
-    min-width:0;
-    font-size:.58rem;
-    letter-spacing:.14em;
-    padding:.74rem 1.2rem;
+    max-width:none;
+  }
+}
+@media (max-width:360px) {
+  .hero-left { padding:.8rem .9rem 1.25rem; }
+  .hero-name-row { column-gap:.55rem; }
+  .hero h1 {
+    font-size:clamp(3.45rem, 15.5vw, 3.95rem);
+    line-height:.9;
+  }
+  .hero-sub-copy-default { display:none; }
+  .hero-sub-copy-fold { display:inline; }
+  .hero-avatar-inline .hero-avatar-frame {
+    width:68px;
+    height:68px;
   }
 }
 </style>
@@ -896,7 +891,7 @@ footer {
         </div>
       </div>
       <div class="hero-divider"></div>
-      <p class="hero-sub">College student obsessed with Android internals, custom ROMs, and building things that actually work. Somewhere between a developer and a relentless tinkerer.</p>
+      <p class="hero-sub"><span class="hero-sub-copy-default">College student obsessed with Android<br class="hero-sub-br">internals, custom ROMs, and building things<br class="hero-sub-br">that actually work. Somewhere between a<br class="hero-sub-br">developer and a relentless tinkerer.</span><span class="hero-sub-copy-fold">College student obsessed with Android<br>internals, custom ROMs, and<br>building things that actually work.<br>Somewhere between a developer<br>and a relentless tinkerer.</span></p>
       <div class="hero-btns">
         <a href="#about" class="btn-p">About Me</a>
         <a href="#contact" class="btn-g">Get In Touch</a>
