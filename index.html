@@ -577,6 +577,81 @@ footer {
   display:flex; align-items:center; justify-content:flex-end;
   padding:0 3rem;
 }
+@media (hover:hover) and (pointer:fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button {
+    cursor:none !important;
+  }
+}
+#site-cursor {
+  position:fixed;
+  top:0; left:0;
+  width:26px; height:26px;
+  border:1px solid rgba(124,111,224,0.45);
+  border-radius:2px;
+  background:rgba(8,8,8,0.18);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.03), 0 0 18px rgba(124,111,224,0.18);
+  backdrop-filter:blur(4px);
+  transform:translate(-50%, -50%);
+  pointer-events:none;
+  opacity:0;
+  z-index:1400;
+  transition:width .18s ease, height .18s ease, opacity .2s ease,
+             border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+#site-cursor::before {
+  content:'';
+  position:absolute;
+  inset:6px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+#site-cursor.is-visible { opacity:1; }
+#site-cursor.is-active {
+  width:58px; height:58px;
+  border-color:rgba(124,111,224,0.82);
+  background:rgba(124,111,224,0.08);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.05), 0 0 24px rgba(124,111,224,0.22);
+}
+#site-cursor.is-pressed {
+  width:22px; height:22px;
+  background:rgba(124,111,224,0.16);
+}
+.cursor-core {
+  position:absolute;
+  top:50%; left:50%;
+  width:4px; height:4px;
+  border-radius:50%;
+  background:var(--acc);
+  transform:translate(-50%, -50%);
+  box-shadow:0 0 14px rgba(124,111,224,0.8);
+  transition:transform .18s ease;
+}
+#site-cursor.is-active .cursor-core {
+  transform:translate(-50%, -50%) scale(1.2);
+}
+.cursor-label {
+  position:absolute;
+  top:calc(100% + 12px);
+  left:50%;
+  transform:translate(-50%, 4px);
+  padding:.28rem .55rem;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(8,8,8,0.94);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.5rem;
+  letter-spacing:.22em;
+  color:var(--text);
+  white-space:nowrap;
+  opacity:0;
+  transition:opacity .18s ease, transform .18s ease, border-color .18s ease;
+}
+#site-cursor.is-active .cursor-label {
+  opacity:1;
+  transform:translate(-50%, 0);
+  border-color:rgba(124,111,224,0.28);
+}
 
 /* ══════════════════════════════════════════
    EMAIL MODAL
@@ -701,9 +776,9 @@ footer {
   section { padding:5rem 1.5rem; }
   .hero-left { padding:.85rem 1.5rem 1.5rem; justify-content:flex-start; }
   .hero-copy { transform:translateY(-1.35rem); }
-  .hero-sub { margin-bottom:2rem; }
+  .hero-sub { max-width:350px; margin-bottom:2rem; }
   .hero-avatar-inline { margin-left:2.4rem; }
-  .hero-avatar-inline .hero-avatar-frame { width:100px; height:100px; }
+  .hero-avatar-inline .hero-avatar-frame { width:132px; height:132px; }
   .hob-grid { grid-template-columns:1fr 1fr; }
   .foot-inner { grid-template-columns:1fr; height:auto; }
   .foot-logo { padding:1.2rem 1.5rem; border-right:none; border-bottom:1px solid var(--border); }
@@ -713,8 +788,55 @@ footer {
   .hob-grid { grid-template-columns:1fr; }
   .hero h1 { font-size:clamp(4rem,14vw,6rem); }
   .hero-copy { transform:translateY(-1rem); }
+  .hero-sub { max-width:330px; }
   .hero-avatar-inline { margin-left:2rem; }
-  .hero-avatar-inline .hero-avatar-frame { width:80px; height:80px; }
+  .hero-avatar-inline .hero-avatar-frame {
+    width:clamp(100px, 31vw, 118px);
+    height:clamp(100px, 31vw, 118px);
+  }
+}
+@media (max-width:430px) {
+  .hero-left { padding:.85rem 1rem 1.35rem; }
+  .hero-copy { transform:translateY(-.7rem); }
+  .hero-eyebrow {
+    gap:.85rem;
+    font-size:.56rem;
+    letter-spacing:.18em;
+  }
+  .hero-eyebrow::before { width:18px; }
+  .hero-name-row {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:start;
+    column-gap:.9rem;
+  }
+  .hero h1 {
+    font-size:clamp(3.35rem, 17vw, 4.6rem);
+    line-height:.9;
+  }
+  .hero-sub {
+    max-width:none;
+    font-size:.72rem;
+    line-height:1.85;
+  }
+  .hero-avatar-inline {
+    margin-left:0;
+    margin-top:.2rem;
+    justify-self:end;
+  }
+  .hero-avatar-inline .hero-avatar-frame {
+    width:clamp(82px, 26vw, 98px);
+    height:clamp(82px, 26vw, 98px);
+  }
+  .hero-btns {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .btn-p,
+  .btn-g {
+    width:100%;
+    padding:.9rem 0;
+  }
 }
 </style>
 </head>
@@ -1157,6 +1279,11 @@ footer {
   <button class="em-close" id="em-close-btn">Dismiss</button>
 </div>
 
+<div id="site-cursor" aria-hidden="true">
+  <div class="cursor-core"></div>
+  <div class="cursor-label">OPEN</div>
+</div>
+
 <script>
 /* ── BACKGROUND LOCK (mobile address-bar jump fix) ── */
 (function() {
@@ -1293,6 +1420,68 @@ var io = new IntersectionObserver(function(entries) {
   });
 }, { threshold:0.08, rootMargin:'0px 0px -30px 0px' });
 revEls.forEach(function(el) { io.observe(el); });
+
+/* â”€â”€ CUSTOM CURSOR â”€â”€ */
+(function() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  var root   = document.documentElement;
+  var cursor = document.getElementById('site-cursor');
+  if (!cursor) return;
+
+  var label = cursor.querySelector('.cursor-label');
+  root.classList.add('has-custom-cursor');
+
+  function setLabel(el) {
+    var custom = el.getAttribute('data-cursor');
+    if (custom) {
+      label.textContent = custom;
+      return;
+    }
+    var href = el.getAttribute('href') || '';
+    if (href.indexOf('mailto:') === 0) label.textContent = 'MAIL';
+    else if (href.indexOf('#') === 0) label.textContent = 'JUMP';
+    else if (el.tagName === 'BUTTON') label.textContent = 'PRESS';
+    else label.textContent = 'OPEN';
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    cursor.classList.add('is-visible');
+  }, { passive:true });
+
+  document.addEventListener('mouseout', function(e) {
+    if (!e.relatedTarget) cursor.classList.remove('is-visible');
+  });
+  window.addEventListener('blur', function() {
+    cursor.classList.remove('is-visible');
+  });
+
+  document.querySelectorAll('a, button, [data-cursor]').forEach(function(el) {
+    el.addEventListener('mouseenter', function() {
+      setLabel(el);
+      cursor.classList.add('is-active');
+    });
+    el.addEventListener('mouseleave', function() {
+      cursor.classList.remove('is-active');
+    });
+    el.addEventListener('focus', function() {
+      setLabel(el);
+      cursor.classList.add('is-active');
+    });
+    el.addEventListener('blur', function() {
+      cursor.classList.remove('is-active');
+    });
+  });
+
+  document.addEventListener('mousedown', function() {
+    cursor.classList.add('is-pressed');
+  });
+  document.addEventListener('mouseup', function() {
+    cursor.classList.remove('is-pressed');
+  });
+})();
 
 /* ── EMAIL LINKS ── */
 (function() {
