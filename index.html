@@ -509,6 +509,7 @@ section { padding:8rem 3rem; position:relative; }
 .soc-list {
   display:flex; flex-direction:column; gap:0;
   border-right:1px solid var(--border-mid);
+  min-height:100%;
 }
 .soc-card {
   display:grid; grid-template-columns:52px 1fr auto;
@@ -518,11 +519,12 @@ section { padding:8rem 3rem; position:relative; }
   text-decoration:none; color:var(--text);
   transition:background .2s;
   min-height:64px;
+  flex:1 1 0;
 }
 .soc-card:last-child { border-bottom:none; }
 .soc-card:hover { background:rgba(124,111,224,0.06); }
 .soc-ico {
-  width:52px; height:64px;
+  width:52px; min-height:64px; height:100%;
   display:flex; align-items:center; justify-content:center;
   border-right:1px solid var(--border);
   flex-shrink:0;
